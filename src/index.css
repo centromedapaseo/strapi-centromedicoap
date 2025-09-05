@@ -18,24 +18,24 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 217 91% 20%;
 
-    --primary: 217 91% 35%;
+    --primary: 208 44% 30%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 91% 25%;
+    --primary-hover: 208 44% 25%;
 
     --secondary: 0 0% 100%;
     --secondary-foreground: 217 91% 35%;
     --secondary-hover: 217 20% 95%;
 
-    --medical-blue: 217 91% 35%;
-    --medical-blue-light: 217 91% 45%;
-    --medical-blue-dark: 217 91% 25%;
-    --medical-teal: 180 76% 45%;
-    --medical-teal-light: 180 76% 55%;
+    --medical-blue: 208 44% 30%;
+    --medical-blue-light: 208 44% 40%;
+    --medical-blue-dark: 208 44% 20%;
+    --medical-teal: 180 76% 54%;
+    --medical-teal-light: 180 76% 64%;
 
     --muted: 217 20% 96%;
     --muted-foreground: 217 20% 45%;
 
-    --accent: 180 76% 45%;
+    --accent: 180 76% 54%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -43,7 +43,7 @@ All colors MUST be HSL.
 
     --border: 217 20% 90%;
     --input: 217 20% 90%;
-    --ring: 217 91% 35%;
+    --ring: 208 44% 30%;
 
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
@@ -121,19 +121,23 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   h1 {
     @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight;
+    font-family: 'Poppins', 'Inter', sans-serif;
   }
 
   h2 {
     @apply text-3xl md:text-4xl font-bold tracking-tight;
+    font-family: 'Poppins', 'Inter', sans-serif;
   }
 
   h3 {
     @apply text-xl md:text-2xl font-semibold;
+    font-family: 'Poppins', 'Inter', sans-serif;
   }
 }
 

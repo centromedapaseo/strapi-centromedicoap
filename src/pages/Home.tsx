@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
@@ -12,43 +12,91 @@ import {
   Clock,
   Star
 } from "lucide-react";
-import hospitalExterior from "@/assets/hospital-exterior.jpg";
+const heroVideo = "https://res.cloudinary.com/djkt9hofl/video/upload/v1757034412/video-hero-principal_ao73ab.mp4";
 import LocationMap from "@/components/LocationMap";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAPScrollAnimation } from "@/hooks/useGSAP";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Home = () => {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const locationRef = useGSAPScrollAnimation(
+    undefined,
+    (element) => {
+      gsap.fromTo(element.children, 
+        { opacity: 0, y: 50 },
+        { opacity: 1, y: 0, duration: 0.8, stagger: 0.2 }
+      );
+    }
+  );
+  const servicesRef = useGSAPScrollAnimation(
+    undefined,
+    (element) => {
+      gsap.fromTo(element.querySelectorAll('.medical-card'), 
+        { opacity: 0, scale: 0.9 },
+        { opacity: 1, scale: 1, duration: 0.6, stagger: 0.15 }
+      );
+    }
+  );
+  const statsRef = useGSAPScrollAnimation(
+    undefined,
+    (element) => {
+      gsap.fromTo(element.children, 
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.8, stagger: 0.1 }
+      );
+    }
+  );
+
+  useEffect(() => {
+    if (heroRef.current) {
+      gsap.fromTo(heroRef.current.children,
+        { opacity: 0, y: 60 },
+        { opacity: 1, y: 0, duration: 1.2, stagger: 0.3, ease: "power2.out" }
+      );
+    }
+  }, []);
+
   return (
     <div className="pt-16">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${hospitalExterior})`,
-          }}
+        {/* Video Background */}
+        <video 
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-accent/80" />
-        </div>
+          <source src={heroVideo} type="video/mp4" />
+        </video>
+        
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/60 to-accent/50" />
         
         <div className="relative z-10 container mx-auto px-4 text-center text-white">
-          <div className="max-w-4xl mx-auto animate-fade-up">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6">
+          <div className="max-w-4xl mx-auto" ref={heroRef}>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight" style={{fontFamily: 'Poppins, Inter, sans-serif'}}>
               El mejor hospital de Apaseo
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto font-light leading-relaxed" style={{fontFamily: 'Inter, Poppins, sans-serif'}}>
               Somos un hospital con +20 años de experiencia, ofreciendo servicios de salud de calidad
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button asChild variant="medical-white" size="lg" className="text-lg px-8 py-4">
+              <Button asChild variant="medical-white" size="lg" className="text-lg px-8 py-4 font-semibold">
                 <Link to="/medicos">Soy médico/a</Link>
               </Button>
-              <Button asChild variant="medical-white" size="lg" className="text-lg px-8 py-4">
+              <Button asChild variant="medical-white" size="lg" className="text-lg px-8 py-4 font-semibold">
                 <Link to="/pacientes">Soy paciente</Link>
               </Button>
-              <Button asChild variant="medical-white" size="lg" className="text-lg px-8 py-4">
+              <Button asChild variant="medical-white" size="lg" className="text-lg px-8 py-4 font-semibold">
                 <Link to="/directorio">Directorio Médico</Link>
               </Button>
-              <Button asChild variant="medical-white" size="lg" className="text-lg px-8 py-4">
+              <Button asChild variant="medical-white" size="lg" className="text-lg px-8 py-4 font-semibold">
                 <Link to="/farmacia">Medicamentos Baratos</Link>
               </Button>
             </div>
@@ -58,7 +106,7 @@ const Home = () => {
 
       {/* Location Section */}
       <section className="py-16 bg-gradient-to-br from-background to-muted/30">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4" ref={locationRef}>
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               Contamos con una excelente ubicación
@@ -86,7 +134,7 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto" ref={servicesRef}>
             {/* Capa 1 - Médicos */}
             <Card className="medical-card group hover:scale-[1.02] transition-all duration-300">
               <CardContent className="p-8">
@@ -173,7 +221,7 @@ const Home = () => {
       {/* Statistics Section */}
       <section className="py-16 bg-gradient-to-br from-primary/5 to-accent/5">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-4xl mx-auto" ref={statsRef}>
             <div className="text-center">
               <div className="p-4 bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-primary" />

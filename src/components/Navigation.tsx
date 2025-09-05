@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Phone, MapPin } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-bueno.png";
 
 const Navigation = () => {
   const location = useLocation();
@@ -24,12 +24,8 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3">
-            <img src={logo} alt="Centro Médico Apaseo" className="h-10 w-auto" />
-            <div className="hidden sm:block">
-              <span className="text-xl font-bold text-medical-blue">Centro Médico</span>
-              <div className="text-sm text-medical-teal">Apaseo el Alto</div>
-            </div>
+          <Link to="/" className="flex items-center" style={{marginLeft: '2cm'}}>
+            <img src={logo} alt="Centro Médico Apaseo" className="w-auto" style={{height: '64px'}} />
           </Link>
 
           {/* Desktop Navigation */}
