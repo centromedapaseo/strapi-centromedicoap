@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
-import logo from "@/assets/logo.png";
+import { MapPin, Phone, Mail, Clock, MessageCircle, Facebook, Instagram } from "lucide-react";
+import logo from "@/assets/imagotipo.png";
 
 const Footer = () => {
   return (
@@ -60,7 +60,11 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center space-x-3">
                 <Phone className="w-4 h-4" />
-                <span className="text-white/80">(413) 165-1301</span>
+                <span className="text-white/80">4131663755</span>
+              </li>
+              <li className="flex items-center space-x-3">
+                <MessageCircle className="w-4 h-4" />
+                <a href="https://wa.me/524131651301" className="text-white/80 hover:text-white transition-colors">4131651301</a>
               </li>
               <li className="flex items-start space-x-3">
                 <MapPin className="w-4 h-4 mt-1" />
@@ -73,6 +77,14 @@ const Footer = () => {
                 <Mail className="w-4 h-4" />
                 <span className="text-white/80">info@centromedicoapaseo.com</span>
               </li>
+              <li className="flex items-center space-x-3">
+                <Facebook className="w-4 h-4" />
+                <a href="https://www.facebook.com/p/Centro-M%C3%A9dico-Apaseo-el-Alto-61560180565970/" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors">Facebook</a>
+              </li>
+              <li className="flex items-center space-x-3">
+                <Instagram className="w-4 h-4" />
+                <a href="https://www.instagram.com/centromedicoapaseo/" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white transition-colors">Instagram</a>
+              </li>
             </ul>
           </div>
 
@@ -83,9 +95,9 @@ const Footer = () => {
               <li className="flex items-center space-x-3">
                 <Clock className="w-4 h-4" />
                 <div className="text-white/80">
-                  <div>Emergencias: 24/7</div>
-                  <div>Consultas: 8:00 - 20:00</div>
-                  <div>Farmacia: 7:00 - 22:00</div>
+                  <div>Atención 24 horas</div>
+                  <div>Consultas: 7:00 am - 9:00 pm</div>
+                  <div>Farmacia: 24 horas</div>
                 </div>
               </li>
             </ul>

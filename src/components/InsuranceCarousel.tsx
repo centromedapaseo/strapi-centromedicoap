@@ -15,6 +15,9 @@ const InsuranceCarousel = () => {
     <div className="w-full">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-foreground mb-4">Red de Aseguradoras</h2>
+        <div className="inline-block bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-sm font-medium mb-4">
+          En construcción
+        </div>
         <p className="text-muted-foreground max-w-2xl mx-auto">
           Trabajamos con las principales aseguradoras para garantizar la mejor atención médica
         </p>
