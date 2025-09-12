@@ -1,15 +1,23 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Award, Users, Building, MessageCircle } from "lucide-react";
+import { Award, Users, Building, MessageCircle, Play } from "lucide-react";
 import heroDoctors from "@/assets/hero-doctors.jpg";
 import LocationMap from "@/components/LocationMap";
 import InsuranceCarousel from "@/components/InsuranceCarousel";
 import ProcessSection from "@/components/ProcessStep";
 
 const Medicos = () => {
-  const heroVideo = "https://res.cloudinary.com/djkt9hofl/video/upload/v1757111404/medicos-hero_kkrnyc.mp4";
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+  const [isSlowConnection, setIsSlowConnection] = useState(false);
+  
+  // URLs del video hero optimizadas
+  const heroVideoWebM = "https://res.cloudinary.com/djkt9hofl/video/upload/q_auto,f_webm,w_1200,h_800,c_fill/v1757111404/medicos-hero_kkrnyc.webm";
+  const heroVideoMP4 = "https://res.cloudinary.com/djkt9hofl/video/upload/q_auto,f_mp4,w_1200,h_800,c_fill/v1757111404/medicos-hero_kkrnyc.mp4";
+  const heroVideoPoster = "https://res.cloudinary.com/djkt9hofl/image/upload/q_auto,f_auto,w_1200,h_800,c_fill/v1757111404/medicos-hero_kkrnyc.jpg";
   
   const processSteps = [
     {
@@ -33,20 +41,102 @@ const Medicos = () => {
   const whatsappLink = "https://wa.me/524131651301?text=Me%20interesa%20saber%20mas%20del%20hospital,%20soy%20el%20Dr:";
   const emailLink = "mailto:info@centromedicoapaseo.com?subject=Solicitud%20de%20información%20médica&body=Estimado%20equipo,%0A%0AMe%20interesa%20recibir%20más%20información%20sobre%20los%20servicios%20médicos%20del%20hospital.%0A%0AGracias";
 
+  useEffect(() => {
+    // Detectar conexión lenta
+    const checkConnection = () => {
+      if ('connection' in navigator) {
+        const connection = (navigator as any).connection;
+        if (connection) {
+          const slowConnections = ['slow-2g', '2g', '3g'];
+          const isSlowNetwork = slowConnections.includes(connection.effectiveType) || connection.downlink < 1.5;
+          setIsSlowConnection(isSlowNetwork);
+          
+          // Si no es conexión lenta, cargar video automáticamente
+          if (!isSlowNetwork) {
+            setShouldLoadVideo(true);
+          }
+        } else {
+          // Si no podemos detectar, asumir buena conexión
+          setShouldLoadVideo(true);
+        }
+      } else {
+        // Fallback: asumir buena conexión
+        setShouldLoadVideo(true);
+      }
+    };
+
+    checkConnection();
+
+    // Lazy load del video solo si debe cargarse
+    const loadVideo = () => {
+      if (heroVideoRef.current && shouldLoadVideo) {
+        heroVideoRef.current.load();
+      }
+    };
+    
+    if (shouldLoadVideo) {
+      setTimeout(loadVideo, 500);
+    }
+  }, [shouldLoadVideo]);
+
   return (
     <div className="pt-16">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Video Background */}
-        <video 
-          className="absolute inset-0 w-full h-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-        >
-          <source src={heroVideo} type="video/mp4" />
-        </video>
+        {shouldLoadVideo ? (
+          <video 
+            ref={heroVideoRef}
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="none"
+            poster={heroVideoPoster}
+            onLoadedData={() => setVideoLoaded(true)}
+            style={{
+              objectFit: 'cover',
+              objectPosition: 'center'
+            }}
+          >
+            <source src={heroVideoWebM} type="video/webm" />
+            <source src={heroVideoMP4} type="video/mp4" />
+            Tu navegador no soporta video HTML5.
+          </video>
+        ) : (
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${heroVideoPoster})`
+            }}
+          />
+        )}
+        
+        {!videoLoaded && shouldLoadVideo && (
+          <div className="absolute inset-0 bg-slate-800 flex items-center justify-center">
+            <div className="animate-pulse text-white/60 text-lg">Cargando video...</div>
+          </div>
+        )}
+        
+        {isSlowConnection && !shouldLoadVideo && (
+          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+            <Button
+              onClick={() => {
+                setShouldLoadVideo(true);
+                setTimeout(() => {
+                  if (heroVideoRef.current) {
+                    heroVideoRef.current.load();
+                  }
+                }, 100);
+              }}
+              className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm"
+            >
+              <Play className="w-5 h-5 mr-2" />
+              Cargar video
+            </Button>
+          </div>
+        )}
         
         {/* Blue Overlay with gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/85 via-primary/80 to-blue-800/90" />

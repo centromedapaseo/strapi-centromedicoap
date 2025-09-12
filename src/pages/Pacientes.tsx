@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Heart, Bed, Utensils, Users as Nurses, MessageCircle, MapPin, Sparkles } from "lucide-react";
+import { Heart, Bed, Utensils, Users as Nurses, MessageCircle, MapPin, Sparkles, Play, Stethoscope, Activity } from "lucide-react";
 import LocationMap from "@/components/LocationMap";
 import InsuranceCarousel from "@/components/InsuranceCarousel";
 import { gsap } from "gsap";
@@ -22,14 +22,65 @@ const Pacientes = () => {
   const buttonRef = useRef<HTMLDivElement>(null);
   const decorElement1Ref = useRef<HTMLDivElement>(null);
   const decorElement2Ref = useRef<HTMLDivElement>(null);
+  
+  // Referencias para los beneficios
+  const benefit1Ref = useRef<HTMLDivElement>(null);
+  const benefit2Ref = useRef<HTMLDivElement>(null);
+  const benefit3Ref = useRef<HTMLDivElement>(null);
+  const benefit4Ref = useRef<HTMLDivElement>(null);
+  
+  // Estado del video
+  const [videoLoaded, setVideoLoaded] = React.useState(false);
+  const [shouldLoadVideo, setShouldLoadVideo] = React.useState(false);
+  const [isSlowConnection, setIsSlowConnection] = React.useState(false);
 
-  // URL del video hero
-  const heroVideo = "https://res.cloudinary.com/djkt9hofl/video/upload/v1757115620/hero-pacientes_tck9jo.mp4";
+  // URLs del video hero optimizadas
+  const heroVideoWebM = "https://res.cloudinary.com/djkt9hofl/video/upload/q_auto,f_webm,w_800,h_600,c_fill/v1757115620/hero-pacientes_tck9jo.webm";
+  const heroVideoMP4 = "https://res.cloudinary.com/djkt9hofl/video/upload/q_auto,f_mp4,w_800,h_600,c_fill/v1757115620/hero-pacientes_tck9jo.mp4";
+  const heroVideoPoster = "https://res.cloudinary.com/djkt9hofl/image/upload/q_auto,f_auto,w_800,h_600,c_fill/v1757115620/hero-pacientes_tck9jo.jpg";
 
   useEffect(() => {
     if (!heroRef.current) return;
 
+    // Detectar conexión lenta
+    const checkConnection = () => {
+      if ('connection' in navigator) {
+        const connection = (navigator as any).connection;
+        if (connection) {
+          const slowConnections = ['slow-2g', '2g', '3g'];
+          const isSlowNetwork = slowConnections.includes(connection.effectiveType) || connection.downlink < 1.5;
+          setIsSlowConnection(isSlowNetwork);
+          
+          // Si no es conexión lenta, cargar video automáticamente
+          if (!isSlowNetwork) {
+            setShouldLoadVideo(true);
+          }
+        } else {
+          // Si no podemos detectar, asumir buena conexión
+          setShouldLoadVideo(true);
+        }
+      } else {
+        // Fallback: asumir buena conexión
+        setShouldLoadVideo(true);
+      }
+    };
+
+    checkConnection();
+
+    // Lazy load del video solo si debe cargarse
+    const loadVideo = () => {
+      if (heroVideoRef.current && shouldLoadVideo) {
+        heroVideoRef.current.load();
+      }
+    };
+    
+    if (shouldLoadVideo) {
+      setTimeout(loadVideo, 500);
+    }
+
     const ctx = gsap.context(() => {
+      // Ensure ScrollTrigger works on mobile
+      ScrollTrigger.config({ ignoreMobileResize: true });
       // Configurar estados iniciales - texto invisible excepto el primer título
       gsap.set([titlePart2Ref.current, subtitleRef.current, buttonRef.current], { 
         opacity: 0, 
@@ -70,9 +121,11 @@ const Pacientes = () => {
       ScrollTrigger.create({
         trigger: heroRef.current,
         start: "top top",
-        end: "400% bottom",
+        end: "+=300vh",
         scrub: 0.5,
         pin: true,
+        pinSpacing: true,
+        anticipatePin: 1,
         onUpdate: (self) => {
           const progress = self.progress;
           
@@ -157,27 +210,105 @@ const Pacientes = () => {
         repeat: -1
       });
 
+      // Animaciones para los beneficios
+      const benefits = [
+        { ref: benefit1Ref, direction: 'left' },
+        { ref: benefit2Ref, direction: 'right' },
+        { ref: benefit3Ref, direction: 'left' },
+        { ref: benefit4Ref, direction: 'right' }
+      ];
+
+      benefits.forEach(({ ref, direction }) => {
+        if (!ref.current) return;
+        
+        const isLeft = direction === 'left';
+        const content = ref.current.querySelector('.benefit-content');
+        const image = ref.current.querySelector('.benefit-image');
+        
+        // Animación para contenido
+        gsap.fromTo(content,
+          {
+            opacity: 0,
+            x: isLeft ? -80 : 80,
+            y: 40
+          },
+          {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            duration: 1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: ref.current,
+              start: "top 85%",
+              toggleActions: "play none none reverse"
+            }
+          }
+        );
+        
+        // Animación para imagen con delay
+        gsap.fromTo(image,
+          {
+            opacity: 0,
+            x: isLeft ? 80 : -80,
+            scale: 0.95
+          },
+          {
+            opacity: 1,
+            x: 0,
+            scale: 1,
+            duration: 1,
+            delay: 0.3,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: ref.current,
+              start: "top 85%",
+              toggleActions: "play none none reverse"
+            }
+          }
+        );
+      });
+
     }, heroRef);
 
-    return () => ctx.revert();
+    // Refresh ScrollTrigger on resize for mobile compatibility
+    const handleResize = () => {
+      setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 100);
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    
+    // Initial refresh after component mount
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
+
+    return () => {
+      ctx.revert();
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
   }, []);
 
   return (
     <div className="pt-16">
       {/* Dynamic Interactive Hero Section */}
-      <section ref={heroRef} className="relative h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-primary/20">
+      <section ref={heroRef} className="relative min-h-screen h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-primary/20">
         {/* Content Layer */}
-        <div className="relative z-20 h-full flex items-center justify-center">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">
+        <div className="relative z-20 h-full flex items-end justify-center pb-16 sm:pb-20 md:pb-24 pt-20 sm:pt-24 md:pt-28">
+          <div className="container mx-auto px-4 sm:px-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-16 items-center max-w-7xl mx-auto">
               
               {/* Left Side - Text Content */}
-              <div className="text-left text-white space-y-8 lg:pr-8">
-                <div className="space-y-6">
+              <div className="text-center lg:text-left text-white space-y-4 sm:space-y-6 lg:space-y-8 lg:pr-8 mt-8 sm:mt-12 lg:mt-16">
+                <div className="space-y-4 sm:space-y-6">
                   {/* Primera parte del título */}
                   <h1 
                     ref={titlePart1Ref}
-                    className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight"
+                    className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight"
                     style={{fontFamily: 'Poppins, Inter, sans-serif'}}
                   >
                     El mejor lugar para
@@ -186,7 +317,7 @@ const Pacientes = () => {
                   {/* Segunda parte del título */}
                   <h1 
                     ref={titlePart2Ref}
-                    className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight bg-gradient-to-r from-blue-200 via-cyan-300 to-blue-300 bg-clip-text text-transparent"
+                    className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight bg-gradient-to-r from-blue-200 via-cyan-300 to-blue-300 bg-clip-text text-transparent"
                     style={{fontFamily: 'Poppins, Inter, sans-serif'}}
                   >
                     atender mi salud
@@ -195,18 +326,18 @@ const Pacientes = () => {
                   {/* Subtítulo */}
                   <p 
                     ref={subtitleRef}
-                    className="text-xl md:text-2xl font-light text-white/90 leading-relaxed max-w-2xl mt-8"
+                    className="text-sm sm:text-base md:text-lg lg:text-xl font-light text-white/90 leading-relaxed max-w-2xl mt-4 sm:mt-6 lg:mt-8"
                     style={{fontFamily: 'Inter, Poppins, sans-serif'}}
                   >
-                    Hospital equipado con equipos de calidad, médicos especialistas y personal atento para ayudarte a mejorar tu salud.
+                    Hospital con equipo y médicos de calidad
                   </p>
                 </div>
 
                 {/* Botón */}
-                <div ref={buttonRef} className="pt-6">
-                  <Button asChild variant="medical-white" size="lg" className="text-xl px-16 py-6 font-semibold shadow-2xl hover:shadow-cyan-500/25 transition-all duration-500 transform hover:scale-105">
-                    <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3">
-                      <MessageCircle className="w-6 h-6" />
+                <div ref={buttonRef} className="pt-4 sm:pt-6">
+                  <Button asChild variant="medical-white" size="lg" className="text-sm sm:text-base lg:text-lg px-4 sm:px-6 lg:px-12 py-3 sm:py-4 lg:py-5 font-semibold shadow-2xl hover:shadow-cyan-500/25 transition-all duration-500 transform hover:scale-105">
+                    <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2">
+                      <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                       <span>Recibir informes</span>
                     </a>
                   </Button>
@@ -214,21 +345,64 @@ const Pacientes = () => {
               </div>
 
               {/* Right Side - Hero Video Content */}
-              <div className="relative flex items-center justify-center lg:justify-end">
+              <div className="relative flex items-center justify-center lg:justify-end mt-6 sm:mt-8 lg:mt-0 order-first lg:order-last">
                 {/* Hero Video Container */}
-                <div className="relative w-full max-w-lg">
+                <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
                   {/* Single Hero Video */}
-                  <div className="relative w-full h-96 lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-                    <video 
-                      ref={heroVideoRef}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                    >
-                      <source src={heroVideo} type="video/mp4" />
-                    </video>
+                  <div className="relative w-full h-48 sm:h-64 md:h-80 lg:h-96 xl:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
+                    {shouldLoadVideo ? (
+                      <video 
+                        ref={heroVideoRef}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="none"
+                        poster={heroVideoPoster}
+                        onLoadedData={() => setVideoLoaded(true)}
+                        style={{
+                          objectFit: 'cover',
+                          objectPosition: 'center'
+                        }}
+                      >
+                        <source src={heroVideoWebM} type="video/webm" />
+                        <source src={heroVideoMP4} type="video/mp4" />
+                        Tu navegador no soporta video HTML5.
+                      </video>
+                    ) : (
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                        style={{
+                          backgroundImage: `url(${heroVideoPoster})`
+                        }}
+                      />
+                    )}
+                    
+                    {!videoLoaded && shouldLoadVideo && (
+                      <div className="absolute inset-0 bg-slate-800 flex items-center justify-center">
+                        <div className="animate-pulse text-white/60">Cargando...</div>
+                      </div>
+                    )}
+                    
+                    {isSlowConnection && !shouldLoadVideo && (
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <Button
+                          onClick={() => {
+                            setShouldLoadVideo(true);
+                            setTimeout(() => {
+                              if (heroVideoRef.current) {
+                                heroVideoRef.current.load();
+                              }
+                            }, 100);
+                          }}
+                          className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm"
+                        >
+                          <Play className="w-5 h-5 mr-2" />
+                          Cargar video
+                        </Button>
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-600/25 via-transparent to-primary/15" />
                   </div>
 
@@ -268,7 +442,7 @@ const Pacientes = () => {
                 </div>
                 <div className="text-5xl font-bold text-accent mb-4">+5,000</div>
                 <p className="text-xl text-foreground font-semibold">
-                  Hemos ayudado a +5,000 pacientes a mejorar su salud
+                  pacientes han mejorado su salud con nosotros
                 </p>
               </CardContent>
             </Card>
@@ -276,57 +450,134 @@ const Pacientes = () => {
         </div>
       </section>
 
-      {/* Service Benefits */}
-      <section className="py-16">
+      {/* Service Benefits - Rediseñado */}
+      <section className="py-20 bg-gradient-to-br from-slate-50/50 to-blue-50/30">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
               Tu recuperación es nuestra prioridad
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               Cuidamos cada detalle para que tu estancia sea cómoda y tu recuperación sea exitosa
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* Cuartos cómodos */}
-            <Card className="medical-card text-center group hover:scale-105 transition-all duration-300">
-              <CardContent className="p-8">
-                <div className="p-4 bg-primary/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 group-hover:bg-primary/20 transition-colors duration-300">
-                  <Bed className="w-10 h-10 text-primary" />
+          <div className="space-y-24 max-w-7xl mx-auto">
+            {/* Beneficio 1 - Cuartos cómodos (Izquierda) */}
+            <div ref={benefit1Ref} className="benefit-item-1 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="benefit-content space-y-6">
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="p-4 bg-primary/10 rounded-2xl">
+                    <Bed className="w-8 h-8 text-primary" />
+                  </div>
+                  <div className="h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent"></div>
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-4">Cuartos cómodos</h3>
-                <p className="text-muted-foreground">
-                  Habitaciones amplias con camas hospitalarias de primera calidad, diseñadas para tu comodidad y recuperación
+                <h3 className="text-3xl md:text-4xl font-bold text-foreground">
+                  Cuartos cómodos
+                </h3>
+                <p className="text-xl text-muted-foreground leading-relaxed">
+                  Cama amplia, privacidad y frecuera
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+              <div className="benefit-image lg:order-last">
+                <Card className="overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 border-0">
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <img 
+                      src="https://res.cloudinary.com/djkt9hofl/image/upload/v1757637472/Cuarto_Hospital_dvapbl.webp" 
+                      alt="Cuarto de hospital cómodo" 
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                    />
+                  </div>
+                </Card>
+              </div>
+            </div>
 
-            {/* Comida rica */}
-            <Card className="medical-card text-center group hover:scale-105 transition-all duration-300">
-              <CardContent className="p-8">
-                <div className="p-4 bg-accent/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 group-hover:bg-accent/20 transition-colors duration-300">
-                  <Utensils className="w-10 h-10 text-accent" />
+            {/* Beneficio 2 - Comida Rica (Derecha) */}
+            <div ref={benefit2Ref} className="benefit-item-2 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="benefit-image lg:order-first">
+                <Card className="overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 border-0">
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <img 
+                      src="https://res.cloudinary.com/djkt9hofl/image/upload/v1757637582/Cafeteria_ynwys6.webp" 
+                      alt="Cafetería del hospital" 
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                    />
+                  </div>
+                </Card>
+              </div>
+              <div className="benefit-content space-y-6 lg:text-right">
+                <div className="flex items-center space-x-4 mb-4 lg:flex-row-reverse lg:space-x-reverse lg:space-x-4">
+                  <div className="p-4 bg-accent/10 rounded-2xl">
+                    <Utensils className="w-8 h-8 text-accent" />
+                  </div>
+                  <div className="h-px flex-1 bg-gradient-to-l from-accent/30 to-transparent lg:bg-gradient-to-r"></div>
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-4">Comida rica</h3>
-                <p className="text-muted-foreground">
-                  Menús nutritivos y deliciosos preparados especialmente para apoyar tu proceso de recuperación
+                <h3 className="text-3xl md:text-4xl font-bold text-foreground">
+                  Comida Rica
+                </h3>
+                <p className="text-xl text-muted-foreground leading-relaxed">
+                  Restaurante y cafetería con alimentos de calidad
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            {/* Personal amable */}
-            <Card className="medical-card text-center group hover:scale-105 transition-all duration-300">
-              <CardContent className="p-8">
-                <div className="p-4 bg-primary/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 group-hover:bg-primary/20 transition-colors duration-300">
-                  <Nurses className="w-10 h-10 text-primary" />
+            {/* Beneficio 3 - Quirófanos con Tecnología (Izquierda) */}
+            <div ref={benefit3Ref} className="benefit-item-3 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="benefit-content space-y-6">
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="p-4 bg-primary/10 rounded-2xl">
+                    <Stethoscope className="w-8 h-8 text-primary" />
+                  </div>
+                  <div className="h-px flex-1 bg-gradient-to-r from-primary/30 to-transparent"></div>
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-4">Personal amable</h3>
-                <p className="text-muted-foreground">
-                  Enfermeras y personal médico altamente capacitado, siempre dispuesto a atenderte con calidez humana
+                <h3 className="text-3xl md:text-4xl font-bold text-foreground">
+                  Quirófanos con Tecnología
+                </h3>
+                <p className="text-xl text-muted-foreground leading-relaxed">
+                  Serás atendido con equipo médico de alta calidad
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+              <div className="benefit-image lg:order-last">
+                <Card className="overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 border-0">
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <img 
+                      src="https://res.cloudinary.com/djkt9hofl/image/upload/v1757637478/Quirofano_phltwn.webp" 
+                      alt="Quirófano con tecnología avanzada" 
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                    />
+                  </div>
+                </Card>
+              </div>
+            </div>
+
+            {/* Beneficio 4 - Clínica de Hemodialisis (Derecha) */}
+            <div ref={benefit4Ref} className="benefit-item-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="benefit-image lg:order-first">
+                <Card className="overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 border-0">
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <img 
+                      src="https://res.cloudinary.com/djkt9hofl/image/upload/v1757637479/Hemodialisis_bmoaoo.webp" 
+                      alt="Clínica de hemodiálisis" 
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
+                    />
+                  </div>
+                </Card>
+              </div>
+              <div className="benefit-content space-y-6 lg:text-right">
+                <div className="flex items-center space-x-4 mb-4 lg:flex-row-reverse lg:space-x-reverse lg:space-x-4">
+                  <div className="p-4 bg-accent/10 rounded-2xl">
+                    <Activity className="w-8 h-8 text-accent" />
+                  </div>
+                  <div className="h-px flex-1 bg-gradient-to-l from-accent/30 to-transparent lg:bg-gradient-to-r"></div>
+                </div>
+                <h3 className="text-3xl md:text-4xl font-bold text-foreground">
+                  Clínica de Hemodiálisis
+                </h3>
+                <p className="text-xl text-muted-foreground leading-relaxed">
+                  Monitoreo en tiempo real, sillones reclinables y supervisión médica
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
