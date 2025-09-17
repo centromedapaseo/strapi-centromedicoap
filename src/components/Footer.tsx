@@ -5,7 +5,7 @@ import logo from "@/assets/imagotipo.png";
 
 const Footer = () => {
   return (
-    <footer className="bg-primary text-white py-16">
+    <footer className="bg-gradient-to-br from-slate-800 via-primary to-slate-900 text-white py-16">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Info */}
@@ -75,7 +75,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center space-x-3">
                 <Mail className="w-4 h-4" />
-                <span className="text-white/80">info@centromedicoapaseo.com</span>
+                <span className="text-white/80">info@centromedicoapaseo.org</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Facebook className="w-4 h-4" />

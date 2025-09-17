@@ -450,7 +450,7 @@ const Pacientes = () => {
         </div>
       </section>
 
-      {/* Service Benefits - Rediseñado */}
+      {/* Service Benefits */}
       <section className="py-20 bg-gradient-to-br from-slate-50/50 to-blue-50/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-20">
@@ -513,10 +513,10 @@ const Pacientes = () => {
                   <div className="h-px flex-1 bg-gradient-to-l from-accent/30 to-transparent lg:bg-gradient-to-r"></div>
                 </div>
                 <h3 className="text-3xl md:text-4xl font-bold text-foreground">
-                  Comida Rica
+                  Cafetería 4to Piso
                 </h3>
                 <p className="text-xl text-muted-foreground leading-relaxed">
-                  Restaurante y cafetería con alimentos de calidad
+                  Alimentos de calidad y comida rica
                 </p>
               </div>
             </div>
@@ -571,10 +571,10 @@ const Pacientes = () => {
                   <div className="h-px flex-1 bg-gradient-to-l from-accent/30 to-transparent lg:bg-gradient-to-r"></div>
                 </div>
                 <h3 className="text-3xl md:text-4xl font-bold text-foreground">
-                  Clínica de Hemodiálisis
+                  Clínica Hemmovil
                 </h3>
                 <p className="text-xl text-muted-foreground leading-relaxed">
-                  Monitoreo en tiempo real, sillones reclinables y supervisión médica
+                  Hemodialisis con sillones reclinables y supervisión médica
                 </p>
               </div>
             </div>

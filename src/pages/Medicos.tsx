@@ -7,6 +7,8 @@ import heroDoctors from "@/assets/hero-doctors.jpg";
 import LocationMap from "@/components/LocationMap";
 import InsuranceCarousel from "@/components/InsuranceCarousel";
 import ProcessSection from "@/components/ProcessStep";
+import SurgeriesCarousel from "@/components/SurgeriesCarousel";
+import HospitalBenefits from "@/components/HospitalBenefits";
 
 const Medicos = () => {
   const heroVideoRef = useRef<HTMLVideoElement>(null);
@@ -206,6 +208,12 @@ const Medicos = () => {
         </div>
       </section>
 
+      {/* Surgeries Available Section */}
+      <SurgeriesCarousel />
+
+      {/* Hospital Benefits Section */}
+      <HospitalBenefits />
+
       {/* Benefits Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
@@ -236,7 +244,7 @@ const Medicos = () => {
         title="Seamos equipo"
         steps={processSteps}
         ctaText="Más información"
-        ctaLink={emailLink}
+        ctaLink="https://api.whatsapp.com/send/?phone=524131651301&text=Me+interesa+saber+mas+del+hospital%2C+soy+el+Dr%3A&type=phone_number&app_absent=0"
       />
 
       {/* FAQ Section */}
@@ -255,7 +263,7 @@ const Medicos = () => {
                   ¿Qué incluye la renta de quirófano?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pt-4">
-                  1 sala equipada con cámara, 2 enfermeras, materiales básicos
+                  Uso de la sala, 1 hora de oxigeno, uso de todos los equipos en quirófano desde la mesa de cirugía hasta el fluoroscopio, bultos de cirugía, instrumental, 1 enfermera durante la cirugía.
                 </AccordionContent>
               </AccordionItem>
 
