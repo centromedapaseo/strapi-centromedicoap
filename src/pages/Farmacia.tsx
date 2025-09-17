@@ -5,9 +5,18 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ShoppingCart, Search, Pill, Heart, Zap, Shield } from "lucide-react";
 
+interface Medication {
+  id: number;
+  name: string;
+  price: number;
+  category: string;
+  description: string;
+  inStock: boolean;
+}
+
 const Farmacia = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [cart, setCart] = useState<any[]>([]);
+  const [cart, setCart] = useState<Medication[]>([]);
 
   const promotions = [
     "20% de descuento en vitaminas",
@@ -89,7 +98,7 @@ const Farmacia = () => {
     med.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const addToCart = (medication: any) => {
+  const addToCart = (medication: Medication) => {
     setCart(prev => [...prev, medication]);
   };
 

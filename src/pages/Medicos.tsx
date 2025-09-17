@@ -219,13 +219,13 @@ const Medicos = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Aumenta tu volumen de pacientes
+              Estamos listos para atenderte
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Nuestra ubicación nos permite recibir pacientes de Apaseo, Celaya, Querétaro y municipios aledaños
             </p>
           </div>
-          
+
           <div className="max-w-4xl mx-auto">
             <LocationMap />
           </div>
@@ -244,7 +244,7 @@ const Medicos = () => {
         title="Seamos equipo"
         steps={processSteps}
         ctaText="Más información"
-        ctaLink="https://api.whatsapp.com/send/?phone=524131651301&text=Me+interesa+saber+mas+del+hospital%2C+soy+el+Dr%3A&type=phone_number&app_absent=0"
+        ctaLink={whatsappLink}
       />
 
       {/* FAQ Section */}

@@ -45,7 +45,7 @@ const Pacientes = () => {
     // Detectar conexión lenta
     const checkConnection = () => {
       if ('connection' in navigator) {
-        const connection = (navigator as any).connection;
+        const connection = (navigator as Navigator & { connection?: { effectiveType: string; downlink: number } }).connection;
         if (connection) {
           const slowConnections = ['slow-2g', '2g', '3g'];
           const isSlowNetwork = slowConnections.includes(connection.effectiveType) || connection.downlink < 1.5;
