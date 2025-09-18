@@ -410,13 +410,12 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiNombreproductoNombreproducto
-  extends Struct.CollectionTypeSchema {
-  collectionName: 'nombreproductos';
+export interface ApiFarmaciaFarmacia extends Struct.CollectionTypeSchema {
+  collectionName: 'farmacias';
   info: {
-    displayName: 'nombreproducto';
-    pluralName: 'nombreproductos';
-    singularName: 'nombreproducto';
+    displayName: 'MedicamentosFarmacia';
+    pluralName: 'farmacias';
+    singularName: 'farmacia';
   };
   options: {
     draftAndPublish: true;
@@ -428,10 +427,45 @@ export interface ApiNombreproductoNombreproducto
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
-      'api::nombreproducto.nombreproducto'
+      'api::farmacia.farmacia'
     > &
       Schema.Attribute.Private;
-    nombreproducto: Schema.Attribute.String;
+    Medicamentos: Schema.Attribute.Component<
+      'nombre-medicamento.farmacia',
+      true
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPromocionmedPromocionmed
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'promocionmeds';
+  info: {
+    displayName: 'promocionmed';
+    pluralName: 'promocionmeds';
+    singularName: 'promocionmed';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    detallepromocion: Schema.Attribute.Component<
+      'nombre-promocion.nomprepromocion',
+      true
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::promocionmed.promocionmed'
+    > &
+      Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -949,7 +983,8 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
-      'api::nombreproducto.nombreproducto': ApiNombreproductoNombreproducto;
+      'api::farmacia.farmacia': ApiFarmaciaFarmacia;
+      'api::promocionmed.promocionmed': ApiPromocionmedPromocionmed;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

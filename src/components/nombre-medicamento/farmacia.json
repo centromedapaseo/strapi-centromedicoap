@@ -1,0 +1,39 @@
+{
+  "collectionName": "components_nombre_medicamento_farmacias",
+  "info": {
+    "displayName": "Farmacia",
+    "icon": "earth"
+  },
+  "options": {},
+  "attributes": {
+    "Imagen": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "Nombremedicamento": {
+      "type": "string"
+    },
+    "Categoria": {
+      "type": "enumeration",
+      "enum": [
+        "Analgesicos",
+        "Antinflamatorios",
+        "Vitaminas",
+        "Antibiotico"
+      ]
+    },
+    "Descripcion": {
+      "type": "string"
+    },
+    "Precio": {
+      "type": "decimal"
+    }
+  },
+  "config": {}
+}

@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_nombre_promocion_nomprepromocions",
+  "info": {
+    "displayName": "nomprepromocion"
+  },
+  "options": {},
+  "attributes": {
+    "detallepromo": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}
