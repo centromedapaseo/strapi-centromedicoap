@@ -2,6 +2,14 @@
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'http://localhost:1337';
 const API_TOKEN = import.meta.env.VITE_STRAPI_API_TOKEN || '';
 
+// Función para asegurar HTTPS en producción
+const getSecureUrl = (url: string): string => {
+  if (url.includes('localhost') || url.includes('127.0.0.1')) {
+    return url; // Mantener HTTP en desarrollo local
+  }
+  return url.replace(/^http:/, 'https:'); // Forzar HTTPS en producción
+};
+
 // Interface para las promociones de Strapi
 export interface StrapiPromocion {
   id: number;
@@ -60,7 +68,7 @@ class StrapiService {
   private apiToken: string;
 
   constructor() {
-    this.baseURL = STRAPI_URL;
+    this.baseURL = getSecureUrl(STRAPI_URL);
     this.apiToken = API_TOKEN;
   }
 
