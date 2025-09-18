@@ -1,97 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { ShoppingCart, Search, Pill, Heart, Zap, Shield } from "lucide-react";
+import { ShoppingCart, Search, Pill, Heart, Zap, Shield, Loader2, AlertCircle, MessageCircle } from "lucide-react";
+import { strapiService, type Medicamento } from "@/services/strapi";
 
-interface Medication {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
-  description: string;
-  inStock: boolean;
-}
+interface Medication extends Medicamento {}
 
 const Farmacia = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [cart, setCart] = useState<Medication[]>([]);
+  const [medications, setMedications] = useState<Medication[]>([]);
+  const [promotions, setPromotions] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [strapiConnected, setStrapiConnected] = useState(false);
 
-  const promotions = [
-    "20% de descuento en vitaminas",
-    "Envío gratis en compras mayores a $500",
-    "2x1 en analgésicos seleccionados"
-  ];
+  // Cargar medicamentos y promociones desde Strapi
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  const medications = [
-    {
-      id: 1,
-      name: "Paracetamol 500mg",
-      price: 45.00,
-      originalPrice: 60.00,
-      category: "Analgésicos",
-      description: "Alivia dolor y reduce fiebre",
-      image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=200&h=200&fit=crop",
-      discount: 25,
-      inStock: true
-    },
-    {
-      id: 2,
-      name: "Ibuprofeno 400mg",
-      price: 55.00,
-      originalPrice: 70.00,
-      category: "Antiinflamatorios",
-      description: "Reduce inflamación y dolor",
-      image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=200&h=200&fit=crop",
-      discount: 21,
-      inStock: true
-    },
-    {
-      id: 3,
-      name: "Vitamina C 1000mg",
-      price: 120.00,
-      originalPrice: 150.00,
-      category: "Vitaminas",
-      description: "Fortalece el sistema inmune",
-      image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=200&h=200&fit=crop",
-      discount: 20,
-      inStock: true
-    },
-    {
-      id: 4,
-      name: "Omeprazol 20mg",
-      price: 85.00,
-      originalPrice: 110.00,
-      category: "Digestivos",
-      description: "Protector gástrico",
-      image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=200&h=200&fit=crop",
-      discount: 23,
-      inStock: true
-    },
-    {
-      id: 5,
-      name: "Loratadina 10mg",
-      price: 35.00,
-      originalPrice: 45.00,
-      category: "Antihistamínicos",
-      description: "Alivia síntomas de alergia",
-      image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=200&h=200&fit=crop",
-      discount: 22,
-      inStock: false
-    },
-    {
-      id: 6,
-      name: "Complejo B",
-      price: 95.00,
-      originalPrice: 130.00,
-      category: "Vitaminas",
-      description: "Mejora energía y metabolismo",
-      image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=200&h=200&fit=crop",
-      discount: 27,
-      inStock: true
-    }
-  ];
+        // Verificar conexión con Strapi
+        const isConnected = await strapiService.checkConnection();
+        setStrapiConnected(isConnected);
+
+        // Cargar medicamentos y promociones en paralelo
+        const [medicamentosData, promocionesData] = await Promise.all([
+          strapiService.getMedicamentos(),
+          strapiService.getPromociones()
+        ]);
+
+        setMedications(medicamentosData);
+        setPromotions(promocionesData);
+
+        if (!isConnected) {
+          setError("Conectado con datos de respaldo - Strapi no disponible");
+        }
+      } catch (err) {
+        console.error('Error loading data:', err);
+        setError("Error al cargar datos");
+        // En caso de error, mostrar datos de fallback del servicio
+        const [fallbackMedications, fallbackPromotions] = await Promise.all([
+          strapiService.getMedicamentos(),
+          strapiService.getPromociones()
+        ]);
+        setMedications(fallbackMedications);
+        setPromotions(fallbackPromotions);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   const filteredMedications = medications.filter(med =>
     med.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -100,6 +65,29 @@ const Farmacia = () => {
 
   const addToCart = (medication: Medication) => {
     setCart(prev => [...prev, medication]);
+  };
+
+  const removeFromCart = (index: number) => {
+    setCart(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const sendWhatsAppOrder = () => {
+    // Crear mensaje para WhatsApp
+    const mensaje = `Hola, me interesan estos medicamentos de su farmacia:
+
+${cart.map(item =>
+  `${item.name} $${item.price}`
+).join(', ')}
+
+¿Podrían confirmarme precios y disponibilidad?`;
+
+    // Codificar para URL
+    const mensajeCodificado = encodeURIComponent(mensaje);
+    const numeroWhatsApp = "524131651301";
+    const whatsappURL = `https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`;
+
+    // Abrir WhatsApp
+    window.open(whatsappURL, '_blank');
   };
 
   const getCategoryIcon = (category: string) => {
@@ -116,17 +104,42 @@ const Farmacia = () => {
   };
 
   return (
-    <div className="pt-16">
+    <div className="pt-16 relative">
+      {/* Floating Cart Indicator */}
+      {cart.length > 0 && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <div className="bg-primary text-white p-4 rounded-full shadow-lg cursor-pointer hover:bg-primary/90 transition-colors"
+               onClick={() => {
+                 const cartSection = document.querySelector('#cart-section');
+                 cartSection?.scrollIntoView({ behavior: 'smooth' });
+               }}>
+            <div className="flex items-center space-x-2">
+              <ShoppingCart className="w-5 h-5" />
+              <span className="font-semibold">{cart.length}</span>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-primary/5 to-accent/5">
+      <section className="py-12 bg-gradient-to-br from-primary/5 to-accent/5">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto animate-fade-up">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
               Farmacia Centro Médico
             </h1>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-xl text-muted-foreground mb-4">
               Medicamentos de calidad a precios accesibles. Tu salud es nuestra prioridad.
             </p>
+
+
+            {error && (
+              <div className="max-w-md mx-auto mb-4">
+                <div className="flex items-center space-x-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{error}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -166,137 +179,165 @@ const Farmacia = () => {
       {/* Products Grid */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {filteredMedications.map((medication) => {
-              const IconComponent = getCategoryIcon(medication.category);
-              
-              return (
-                <Card key={medication.id} className="medical-card group hover:scale-[1.02] transition-all duration-300 overflow-hidden">
-                  <CardHeader className="p-0">
-                    <div className="relative">
-                      <div className="h-48 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                        <IconComponent className="w-16 h-16 text-primary" />
-                      </div>
-                      
-                      {medication.discount && (
-                        <Badge className="absolute top-2 right-2 bg-red-500 text-white">
-                          -{medication.discount}%
-                        </Badge>
-                      )}
-                      
-                      {!medication.inStock && (
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                          <Badge variant="secondary" className="bg-red-100 text-red-800">
-                            Agotado
-                          </Badge>
-                        </div>
-                      )}
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <div>
-                        <h3 className="text-lg font-bold text-foreground mb-2">
-                          {medication.name}
-                        </h3>
-                        
-                        <Badge variant="outline" className="mb-2">
-                          {medication.category}
-                        </Badge>
-                        
-                        <p className="text-sm text-muted-foreground">
-                          {medication.description}
-                        </p>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-2xl font-bold text-primary">
-                              ${medication.price}
-                            </span>
-                            {medication.originalPrice && (
-                              <span className="text-sm text-muted-foreground line-through">
-                                ${medication.originalPrice}
-                              </span>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+              <p className="text-muted-foreground">Cargando medicamentos...</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                {filteredMedications.map((medication) => {
+                  const IconComponent = getCategoryIcon(medication.category);
+
+                  return (
+                    <Card key={medication.id} className="medical-card group hover:scale-[1.02] transition-all duration-300 overflow-hidden">
+                      <CardHeader className="p-0">
+                        <div className="relative">
+                          <div className="h-48 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
+                            {medication.image ? (
+                              <img
+                                src={medication.image}
+                                alt={medication.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <IconComponent className="w-16 h-16 text-primary" />
                             )}
                           </div>
+
+                          {!medication.inStock && (
+                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                              <Badge variant="secondary" className="bg-red-100 text-red-800">
+                                Agotado
+                              </Badge>
+                            </div>
+                          )}
                         </div>
-                        
-                        <Button
-                          variant={medication.inStock ? "medical-primary" : "outline"}
-                          disabled={!medication.inStock}
-                          onClick={() => addToCart(medication)}
-                          className="flex items-center space-x-2"
-                        >
-                          <ShoppingCart className="w-4 h-4" />
-                          <span>{medication.inStock ? "Agregar" : "Agotado"}</span>
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-          
-          {filteredMedications.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">
-                No se encontraron medicamentos para tu búsqueda
-              </p>
-            </div>
+                      </CardHeader>
+
+                      <CardContent className="p-6">
+                        <div className="space-y-4">
+                          <div>
+                            <h3 className="text-lg font-bold text-foreground mb-2">
+                              {medication.name}
+                            </h3>
+
+                            <Badge variant="outline" className="mb-2">
+                              {medication.category}
+                            </Badge>
+
+                            <p className="text-sm text-muted-foreground">
+                              {medication.description}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="flex items-center space-x-2">
+                                <span className="text-2xl font-bold text-primary">
+                                  ${medication.price}
+                                </span>
+                              </div>
+                            </div>
+
+                            <Button
+                              variant={medication.inStock ? "medical-primary" : "outline"}
+                              disabled={!medication.inStock}
+                              onClick={() => {
+                                addToCart(medication);
+                              }}
+                              className="flex items-center space-x-2"
+                            >
+                              <ShoppingCart className="w-4 h-4" />
+                              <span>{medication.inStock ? "Agregar" : "Agotado"}</span>
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              {filteredMedications.length === 0 && (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground text-lg">
+                    No se encontraron medicamentos para tu búsqueda
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section className="py-16 bg-gradient-to-br from-primary/5 to-accent/5">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl font-bold text-foreground mb-4">
-              ¿Necesitas ayuda con tu pedido?
-            </h2>
-            <p className="text-muted-foreground mb-8">
-              Nuestro equipo está listo para ayudarte a encontrar los medicamentos que necesitas
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                asChild 
-                variant="medical-primary" 
-                size="lg" 
-                className="text-lg px-8"
-              >
-                <a 
-                  href="https://wa.me/524131651301?text=Me%20interesa%20información%20sobre%20medicamentos" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+      {/* Cart Section */}
+      {cart.length > 0 && (
+        <section id="cart-section" className="py-16 bg-gradient-to-br from-primary/5 to-accent/5">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl font-bold text-foreground mb-8 text-center">
+                Consultar medicamentos por whatsapp
+              </h2>
+
+              {/* Cart Items */}
+              <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <div className="space-y-4">
+                  {cart.map((item, index) => (
+                    <div key={index} className="flex items-center justify-between border-b border-gray-200 pb-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center">
+                          {getCategoryIcon(item.category) && React.createElement(getCategoryIcon(item.category), { className: "w-8 h-8 text-primary" })}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-foreground">{item.name}</h3>
+                          <p className="text-sm text-muted-foreground">{item.category}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <span className="text-lg font-bold text-primary">${item.price}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeFromCart(index)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          Quitar
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Total */}
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <div className="flex justify-between items-center text-xl font-bold">
+                    <span>Total:</span>
+                    <span className="text-primary">${cart.reduce((total, item) => total + item.price, 0)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* WhatsApp Order Button */}
+              <div className="text-center">
+                <Button
+                  onClick={sendWhatsAppOrder}
+                  variant="medical-primary"
+                  size="lg"
+                  className="text-lg px-8"
                 >
+                  <MessageCircle className="w-5 h-5 mr-2" />
                   Consultar por WhatsApp
-                </a>
-              </Button>
-              
-              <Button 
-                variant="medical-secondary" 
-                size="lg" 
-                className="text-lg px-8"
-              >
-                Llamar a Farmacia
-              </Button>
-            </div>
-            
-            {cart.length > 0 && (
-              <div className="mt-8 p-4 bg-white rounded-lg shadow-md">
-                <p className="text-primary font-semibold">
-                  Tienes {cart.length} medicamento(s) en tu carrito
+                </Button>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Se enviará la lista de medicamentos para consultar precios y disponibilidad
                 </p>
               </div>
-            )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 };
