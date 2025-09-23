@@ -2,15 +2,6 @@
 const STRAPI_URL = 'https://special-nurture-955505aa13.strapiapp.com';
 const API_TOKEN = 'f0b6cd97a4471c8e1ae78d17b73eb76a99def67b67a0e5db8302a9b433478997f4fdcc3186941a9b5cb6d89a5f125180919e3af4b1c2539ae495b1796b20776f99014550cf8fe8e0d288b1c9657643f7ff4b5e7713c63a64ed19a1d397ed978e196fbc29a256e70b5bce88a1bea0acec733b979164e76608144ddd15f245fc59';
 
-console.log('🔧 Strapi Service Config:', {
-  STRAPI_URL_ENV: import.meta.env.VITE_STRAPI_URL,
-  STRAPI_URL_FINAL: STRAPI_URL,
-  API_TOKEN_ENV: import.meta.env.VITE_STRAPI_API_TOKEN ? import.meta.env.VITE_STRAPI_API_TOKEN.substring(0, 20) + '...' : 'NOT SET',
-  API_TOKEN_FINAL: API_TOKEN ? API_TOKEN.substring(0, 20) + '...' : 'NOT SET',
-  MODE: import.meta.env.MODE,
-  PROD: import.meta.env.PROD,
-  ALL_ENV: import.meta.env
-});
 
 // Función para asegurar HTTPS en producción
 const getSecureUrl = (url: string): string => {
@@ -85,13 +76,6 @@ class StrapiService {
   private async fetchFromStrapi(endpoint: string) {
     const url = `${this.baseURL}/api${endpoint}`;
 
-    console.log('🚀 Fetching from Strapi:', {
-      url,
-      hasToken: !!this.apiToken,
-      tokenLength: this.apiToken?.length || 0,
-      baseURL: this.baseURL
-    });
-
     try {
       const response = await fetch(url, {
         headers: {
@@ -100,23 +84,13 @@ class StrapiService {
         },
       });
 
-      console.log('📡 Response status:', response.status, response.statusText);
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ Response error:', {
-          status: response.status,
-          statusText: response.statusText,
-          body: errorText
-        });
-        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log('✅ Response data:', data);
-      return data;
+      return await response.json();
     } catch (error) {
-      console.error('❌ Error fetching from Strapi:', error);
+      console.error('Error fetching from Strapi:', error);
       throw error;
     }
   }
@@ -239,11 +213,6 @@ class StrapiService {
   // Verificar si Strapi está disponible
   async checkConnection(): Promise<boolean> {
     try {
-      console.log('🔍 Checking Strapi connection...', {
-        url: `${this.baseURL}/api/farmacias`,
-        hasToken: !!this.apiToken
-      });
-
       const response = await fetch(`${this.baseURL}/api/farmacias`, {
         method: 'HEAD',
         headers: {
@@ -251,15 +220,8 @@ class StrapiService {
         },
       });
 
-      console.log('🔗 Connection check result:', {
-        ok: response.ok,
-        status: response.status,
-        statusText: response.statusText
-      });
-
       return response.ok;
     } catch (error) {
-      console.error('❌ Connection check failed:', error);
       return false;
     }
   }
