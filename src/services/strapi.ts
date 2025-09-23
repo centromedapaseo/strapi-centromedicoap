@@ -383,8 +383,8 @@ class StrapiService {
 
       return doctores.length > 0 ? doctores : this.getFallbackDoctores();
     } catch (error) {
-      console.error('Error getting doctores:', error);
-      // Retornar datos de fallback en caso de error
+      console.warn('Medicos endpoint not found, using fallback data:', error);
+      // Retornar datos de fallback si el endpoint no existe
       return this.getFallbackDoctores();
     }
   }
