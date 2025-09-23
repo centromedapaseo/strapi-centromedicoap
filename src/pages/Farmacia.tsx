@@ -60,7 +60,8 @@ const Farmacia = () => {
 
   const filteredMedications = medications.filter(med =>
     med.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    med.category.toLowerCase().includes(searchTerm.toLowerCase())
+    med.presentation.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    med.activeCompound.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const addToCart = (medication: Medication) => {
@@ -76,7 +77,7 @@ const Farmacia = () => {
     const mensaje = `Hola, me interesan estos medicamentos de su farmacia:
 
 ${cart.map(item =>
-  `${item.name} $${item.price}`
+  `${item.name} (${item.content}) - ${item.presentation}`
 ).join(', ')}
 
 ¿Podrían confirmarme precios y disponibilidad?`;
@@ -90,17 +91,21 @@ ${cart.map(item =>
     window.open(whatsappURL, '_blank');
   };
 
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case "Analgésicos":
-        return Zap;
-      case "Vitaminas":
-        return Shield;
-      case "Antiinflamatorios":
-        return Heart;
-      default:
-        return Pill;
+  const getPresentationIcon = (presentation: string) => {
+    const presentationLower = presentation.toLowerCase();
+    if (presentationLower.includes('tableta') || presentationLower.includes('comprimido')) {
+      return Pill;
     }
+    if (presentationLower.includes('jarabe') || presentationLower.includes('suspensión')) {
+      return Heart;
+    }
+    if (presentationLower.includes('cápsula')) {
+      return Shield;
+    }
+    if (presentationLower.includes('inyectable') || presentationLower.includes('ampolla')) {
+      return Zap;
+    }
+    return Pill;
   };
 
   return (
@@ -189,7 +194,7 @@ ${cart.map(item =>
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
                 {filteredMedications.map((medication) => {
-                  const IconComponent = getCategoryIcon(medication.category);
+                  const IconComponent = getPresentationIcon(medication.presentation);
 
                   return (
                     <Card key={medication.id} className="medical-card group hover:scale-[1.02] transition-all duration-300 overflow-hidden">
@@ -224,24 +229,21 @@ ${cart.map(item =>
                               {medication.name}
                             </h3>
 
-                            <Badge variant="outline" className="mb-2">
-                              {medication.category}
-                            </Badge>
+                            <div className="space-y-1 mb-3">
+                              <Badge variant="outline" className="mr-2 mb-1">
+                                {medication.content}
+                              </Badge>
+                              <Badge variant="secondary" className="mb-1">
+                                {medication.presentation}
+                              </Badge>
+                            </div>
 
-                            <p className="text-sm text-muted-foreground">
-                              {medication.description}
+                            <p className="text-sm text-muted-foreground font-medium">
+                              <span className="text-foreground">Compuesto activo:</span> {medication.activeCompound}
                             </p>
                           </div>
 
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="flex items-center space-x-2">
-                                <span className="text-2xl font-bold text-primary">
-                                  ${medication.price}
-                                </span>
-                              </div>
-                            </div>
-
+                          <div className="flex justify-center">
                             <Button
                               variant={medication.inStock ? "medical-primary" : "outline"}
                               disabled={!medication.inStock}
@@ -250,8 +252,8 @@ ${cart.map(item =>
                               }}
                               className="flex items-center space-x-2"
                             >
-                              <ShoppingCart className="w-4 h-4" />
-                              <span>{medication.inStock ? "Agregar" : "Agotado"}</span>
+                              <MessageCircle className="w-4 h-4" />
+                              <span>{medication.inStock ? "Consultar" : "Agotado"}</span>
                             </Button>
                           </div>
                         </div>
@@ -289,15 +291,14 @@ ${cart.map(item =>
                     <div key={index} className="flex items-center justify-between border-b border-gray-200 pb-4">
                       <div className="flex items-center space-x-4">
                         <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center">
-                          {getCategoryIcon(item.category) && React.createElement(getCategoryIcon(item.category), { className: "w-8 h-8 text-primary" })}
+                          {getPresentationIcon(item.presentation) && React.createElement(getPresentationIcon(item.presentation), { className: "w-8 h-8 text-primary" })}
                         </div>
                         <div>
                           <h3 className="font-semibold text-foreground">{item.name}</h3>
-                          <p className="text-sm text-muted-foreground">{item.category}</p>
+                          <p className="text-sm text-muted-foreground">{item.content} - {item.presentation}</p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-4">
-                        <span className="text-lg font-bold text-primary">${item.price}</span>
                         <Button
                           variant="outline"
                           size="sm"
@@ -311,13 +312,6 @@ ${cart.map(item =>
                   ))}
                 </div>
 
-                {/* Total */}
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <div className="flex justify-between items-center text-xl font-bold">
-                    <span>Total:</span>
-                    <span className="text-primary">${cart.reduce((total, item) => total + item.price, 0)}</span>
-                  </div>
-                </div>
               </div>
 
               {/* WhatsApp Order Button */}

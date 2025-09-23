@@ -10,13 +10,46 @@ export interface NombreMedicamentoFarmacia extends Struct.ComponentSchema {
     Categoria: Schema.Attribute.Enumeration<
       ['Analgesicos', 'Antinflamatorios', 'Vitaminas', 'Antibiotico']
     >;
-    Descripcion: Schema.Attribute.String;
+    CompuestoActivo: Schema.Attribute.String;
+    Contenido: Schema.Attribute.String;
     Imagen: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios',
       true
     >;
     Nombremedicamento: Schema.Attribute.String;
-    Precio: Schema.Attribute.Decimal;
+    Presentacion: Schema.Attribute.Enumeration<
+      ['Tableta', 'Spray', 'Crema', 'Gel', 'Solucion', 'Suspencion']
+    >;
+  };
+}
+
+export interface NombreMedicosMedicos extends Struct.ComponentSchema {
+  collectionName: 'components_nombre_medicos_medicos';
+  info: {
+    displayName: 'Medicos';
+    icon: 'handHeart';
+  };
+  attributes: {
+    Especialidad: Schema.Attribute.Enumeration<
+      [
+        'Cirug\u00EDa General',
+        'Dermatolog\u00EDa',
+        'Gastrointerolog\u00EDa',
+        'Gineco-Obstetricia',
+        'Medicina General',
+        'Nefrolog\u00EDa',
+        'Nutriolog\u00EDa',
+        'Odontolog\u00EDa',
+        'Odontopediatr\u00EDa',
+        'Oncolog\u00EDa',
+        'Otorrinolaringolog\u00EDa',
+        'Pediatr\u00EDa',
+        'Psicolog\u00EDa',
+        'Traumatolog\u00EDa y Ortopedia',
+        'Urologia',
+      ]
+    >;
+    Nombre: Schema.Attribute.String;
   };
 }
 
@@ -34,6 +67,7 @@ declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
       'nombre-medicamento.farmacia': NombreMedicamentoFarmacia;
+      'nombre-medicos.medicos': NombreMedicosMedicos;
       'nombre-promocion.nomprepromocion': NombrePromocionNomprepromocion;
     }
   }

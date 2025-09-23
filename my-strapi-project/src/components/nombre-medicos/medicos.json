@@ -1,0 +1,34 @@
+{
+  "collectionName": "components_nombre_medicos_medicos",
+  "info": {
+    "displayName": "Medicos",
+    "icon": "handHeart"
+  },
+  "options": {},
+  "attributes": {
+    "Nombre": {
+      "type": "string"
+    },
+    "Especialidad": {
+      "type": "enumeration",
+      "enum": [
+        "Cirugía General",
+        "Dermatología",
+        "Gastrointerología",
+        "Gineco-Obstetricia",
+        "Medicina General",
+        "Nefrología",
+        "Nutriología",
+        "Odontología",
+        "Odontopediatría",
+        "Oncología",
+        "Otorrinolaringología",
+        "Pediatría",
+        "Psicología",
+        "Traumatología y Ortopedia",
+        "Urologia"
+      ]
+    }
+  },
+  "config": {}
+}

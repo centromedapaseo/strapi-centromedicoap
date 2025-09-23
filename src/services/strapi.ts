@@ -2,6 +2,10 @@
 const STRAPI_URL = 'https://special-nurture-955505aa13.strapiapp.com';
 const API_TOKEN = 'f0b6cd97a4471c8e1ae78d17b73eb76a99def67b67a0e5db8302a9b433478997f4fdcc3186941a9b5cb6d89a5f125180919e3af4b1c2539ae495b1796b20776f99014550cf8fe8e0d288b1c9657643f7ff4b5e7713c63a64ed19a1d397ed978e196fbc29a256e70b5bce88a1bea0acec733b979164e76608144ddd15f245fc59';
 
+// Configuración para Strapi local (doctores)
+const LOCAL_STRAPI_URL = 'http://localhost:1338';
+const LOCAL_API_TOKEN = ''; // Configurar después de crear el token en admin
+
 
 // Función para asegurar HTTPS en producción
 const getSecureUrl = (url: string): string => {
@@ -34,9 +38,10 @@ export interface StrapiMedicamento {
   Medicamentos: Array<{
     id: number;
     Nombremedicamento: string;
-    Categoria: 'Analgesicos' | 'Antinflamatorios' | 'Vitaminas' | 'Antibiotico';
-    Descripcion: string;
-    Precio: number;
+    Categoria: string;
+    Contenido: string;
+    CompuestoActivo: string;
+    Presentacion: string;
     Imagen: Array<{
       id: number;
       documentId: string;
@@ -57,11 +62,28 @@ export interface StrapiMedicamento {
 export interface Medicamento {
   id: number;
   name: string;
-  price: number;
-  category: string;
-  description: string;
+  content: string;
+  activeCompound: string;
+  presentation: string;
   image?: string;
   inStock: boolean;
+}
+
+// Interfaces para Doctores
+export interface StrapiMedico {
+  id: number;
+  documentId: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  Nombre: string;
+  Especialidad: string;
+}
+
+export interface Doctor {
+  id: number;
+  name: string;
+  specialty: string;
 }
 
 class StrapiService {
@@ -71,6 +93,32 @@ class StrapiService {
   constructor() {
     this.baseURL = getSecureUrl(STRAPI_URL);
     this.apiToken = API_TOKEN;
+  }
+
+  // Función para hacer fetch desde Strapi local (doctores)
+  private async fetchFromLocalStrapi(endpoint: string) {
+    const url = `${LOCAL_STRAPI_URL}/api${endpoint}`;
+
+    try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+
+      if (LOCAL_API_TOKEN) {
+        headers.Authorization = `Bearer ${LOCAL_API_TOKEN}`;
+      }
+
+      const response = await fetch(url, { headers });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching from local Strapi:', error);
+      throw error;
+    }
   }
 
   private async fetchFromStrapi(endpoint: string) {
@@ -95,7 +143,7 @@ class StrapiService {
     }
   }
 
-  // Obtener todos los medicamentos
+  // Obtener todos los medicamentos desde Strapi Cloud (con fallback)
   async getMedicamentos(): Promise<Medicamento[]> {
     try {
       const data = await this.fetchFromStrapi('/farmacias?populate=Medicamentos.Imagen');
@@ -115,9 +163,9 @@ class StrapiService {
             medicamentos.push({
               id: med.id,
               name: med.Nombremedicamento,
-              price: med.Precio,
-              category: this.mapCategory(med.Categoria),
-              description: med.Descripcion,
+              content: med.Contenido || "Consultar",
+              activeCompound: med.CompuestoActivo || "No especificado",
+              presentation: med.Presentacion || "No especificado",
               image: imageUrl,
               inStock: true // Por defecto, consideramos que está en stock
             });
@@ -125,7 +173,7 @@ class StrapiService {
         }
       });
 
-      return medicamentos;
+      return medicamentos.length > 0 ? medicamentos : this.getFallbackMedicamentos();
     } catch (error) {
       console.error('Error getting medicamentos:', error);
       // Retornar datos de fallback en caso de error
@@ -133,43 +181,128 @@ class StrapiService {
     }
   }
 
-  // Mapear categorías de Strapi al formato del componente
-  private mapCategory(category: string): string {
-    const categoryMap: { [key: string]: string } = {
-      'Analgesicos': 'Analgésicos',
-      'Antinflamatorios': 'Antiinflamatorios',
-      'Vitaminas': 'Vitaminas',
-      'Antibiotico': 'Antibióticos'
-    };
-
-    return categoryMap[category] || category;
-  }
 
   // Datos de fallback si Strapi no está disponible
   private getFallbackMedicamentos(): Medicamento[] {
     return [
       {
         id: 1,
-        name: "Paracetamol 500mg",
-        price: 45.00,
-        category: "Analgésicos",
-        description: "Alivia dolor y reduce fiebre",
+        name: "CAPTOPRIL",
+        content: "25 MG",
+        activeCompound: "CAPTOPRIL",
+        presentation: "TABLETA",
         inStock: true
       },
       {
         id: 2,
-        name: "Ibuprofeno 400mg",
-        price: 55.00,
-        category: "Antiinflamatorios",
-        description: "Reduce inflamación y dolor",
+        name: "NEUROBION",
+        content: "--",
+        activeCompound: "TIAMINA, PIRIDOXINA, CIANOCOBALAMINA",
+        presentation: "TABLETA",
         inStock: true
       },
       {
         id: 3,
-        name: "Vitamina C 1000mg",
-        price: 120.00,
-        category: "Vitaminas",
-        description: "Fortalece el sistema inmune",
+        name: "LEVOFLOXACINO",
+        content: "750 MG",
+        activeCompound: "LEVOFLOXACINO",
+        presentation: "TABLETA",
+        inStock: true
+      },
+      {
+        id: 4,
+        name: "PANTOPRAZOL",
+        content: "40 MG",
+        activeCompound: "PANTOPRAZOL",
+        presentation: "TABLETA",
+        inStock: true
+      },
+      {
+        id: 5,
+        name: "SUPERPUNCK",
+        content: "250 ML",
+        activeCompound: "SUPERPUNCK",
+        presentation: "SPRAY",
+        inStock: true
+      },
+      {
+        id: 6,
+        name: "NEURONTIN",
+        content: "600 MG",
+        activeCompound: "GABAPETINA",
+        presentation: "TABLETA",
+        inStock: true
+      },
+      {
+        id: 7,
+        name: "CLOVEX",
+        content: "5 GR",
+        activeCompound: "ACICLOVIR",
+        presentation: "CREMA",
+        inStock: true
+      },
+      {
+        id: 8,
+        name: "AVAPENA",
+        content: "25 MG",
+        activeCompound: "CLOROPIRAMINA",
+        presentation: "TABLETA",
+        inStock: true
+      },
+      {
+        id: 9,
+        name: "GELMICIN",
+        content: "40 GR",
+        activeCompound: "BETAMETASONA, GENTAMICINA, CLOTRIMAZOL",
+        presentation: "GEL",
+        inStock: true
+      },
+      {
+        id: 10,
+        name: "DIMEFOR XR",
+        content: "750 MG",
+        activeCompound: "METFORMINA",
+        presentation: "TABLETA",
+        inStock: true
+      },
+      {
+        id: 11,
+        name: "AMOXICILINA",
+        content: "500 MG/125 MG",
+        activeCompound: "AMOXICILINA, ACIDO CLAVULANICO",
+        presentation: "TABLETA",
+        inStock: true
+      },
+      {
+        id: 12,
+        name: "AMOXICILINA",
+        content: "875 MG/125 MG",
+        activeCompound: "AMOXICILINA, ACIDO CLAVULANICO",
+        presentation: "TABLETA",
+        inStock: true
+      },
+      {
+        id: 13,
+        name: "ALUMAG",
+        content: "240 ML",
+        activeCompound: "HIDROXIDO DE ALUMINIO Y HIDROXIDO DE MAGNESIO",
+        presentation: "SOLUCION",
+        inStock: true
+      },
+      {
+        id: 14,
+        name: "COMBIVENT RESPIMAT",
+        content: "4.5 ML",
+        activeCompound: "BROMURO DE IPRATROPIO, SALBUTAMOL",
+        presentation: "SOLUCION",
+        inStock: true
+      },
+      {
+        id: 15,
+        name: "AMOXICLAV BID",
+        content: "200 MG",
+        activeCompound: "AMOXICILINA, ACIDO CLAVULANICO",
+        presentation: "SUSPENSION",
         inStock: true
       }
     ];
@@ -224,6 +357,87 @@ class StrapiService {
     } catch (error) {
       return false;
     }
+  }
+
+  // Obtener doctores desde Strapi Cloud (con fallback)
+  async getDoctores(): Promise<Doctor[]> {
+    try {
+      const data = await this.fetchFromStrapi('/medicos?populate=*');
+
+      // Transformar datos de Strapi al formato del componente
+      const doctores: Doctor[] = [];
+
+      data.data.forEach((medicoGroup: any) => {
+        if (medicoGroup.Medicos && medicoGroup.Medicos.length > 0) {
+          medicoGroup.Medicos.forEach((medico: any) => {
+            if (medico.Nombre) {
+              doctores.push({
+                id: medico.id,
+                name: medico.Nombre,
+                specialty: medico.Especialidad || 'General',
+              });
+            }
+          });
+        }
+      });
+
+      return doctores.length > 0 ? doctores : this.getFallbackDoctores();
+    } catch (error) {
+      console.error('Error getting doctores:', error);
+      // Retornar datos de fallback en caso de error
+      return this.getFallbackDoctores();
+    }
+  }
+
+  // Datos de fallback para doctores
+  private getFallbackDoctores(): Doctor[] {
+    return [
+      {
+        id: 1,
+        name: "Dra. María Elena Rodríguez",
+        specialty: "Pediatría"
+      },
+      {
+        id: 2,
+        name: "Dr. Carlos Alberto Méndez",
+        specialty: "Pediatría"
+      },
+      {
+        id: 3,
+        name: "Dra. Ana Patricia Herrera",
+        specialty: "Pediatría"
+      },
+      {
+        id: 4,
+        name: "Dra. Laura Isabel Castillo",
+        specialty: "Ginecología"
+      },
+      {
+        id: 5,
+        name: "Dr. Roberto Alejandro Torres",
+        specialty: "Ginecología"
+      },
+      {
+        id: 6,
+        name: "Dra. Carmen Rosa Jiménez",
+        specialty: "Ginecología"
+      },
+      {
+        id: 7,
+        name: "Dr. Miguel Ángel Vázquez",
+        specialty: "Traumatología"
+      },
+      {
+        id: 8,
+        name: "Dr. Fernando José Ramírez",
+        specialty: "Traumatología"
+      },
+      {
+        id: 9,
+        name: "Dra. Patricia Guadalupe Morales",
+        specialty: "Traumatología"
+      }
+    ];
   }
 }
 

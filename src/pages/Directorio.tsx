@@ -1,193 +1,373 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Stethoscope, Baby, Heart, Bone, Filter } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Stethoscope, Baby, Heart, Bone, MessageCircle, Loader2, AlertCircle, Search, Brain, Eye, Scissors, Activity, UserCheck, Smile, Pill, ChevronDown, X } from "lucide-react";
+import { strapiService, type Doctor } from "@/services/strapi";
 
 const Directorio = () => {
-  const [selectedSpecialty, setSelectedSpecialty] = useState("Todas");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSpecialties, setSelectedSpecialties] = useState<string[]>([]);
+  const [specialtySearchTerm, setSpecialtySearchTerm] = useState("");
+  const [isSpecialtyDropdownOpen, setIsSpecialtyDropdownOpen] = useState(false);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const specialties = [
-    { name: "Todas", icon: Filter },
-    { name: "Pediatría", icon: Baby },
-    { name: "Ginecología", icon: Heart },
-    { name: "Traumatología", icon: Bone },
-  ];
+  // Obtener especialidades únicas de los doctores
+  const uniqueSpecialties = [...new Set(doctors.map(doctor => doctor.specialty))].sort();
 
-  const doctors = [
-    {
-      name: "Dra. María Elena Rodríguez",
-      specialty: "Pediatría",
-      experience: 15,
-      id: 1
-    },
-    {
-      name: "Dr. Carlos Alberto Méndez",
-      specialty: "Pediatría", 
-      experience: 12,
-      id: 2
-    },
-    {
-      name: "Dra. Ana Patricia Herrera",
-      specialty: "Pediatría",
-      experience: 18,
-      id: 3
-    },
-    {
-      name: "Dra. Laura Isabel Castillo",
-      specialty: "Ginecología",
-      experience: 20,
-      id: 4
-    },
-    {
-      name: "Dr. Roberto Alejandro Torres",
-      specialty: "Ginecología",
-      experience: 16,
-      id: 5
-    },
-    {
-      name: "Dra. Carmen Rosa Jiménez",
-      specialty: "Ginecología",
-      experience: 14,
-      id: 6
-    },
-    {
-      name: "Dr. Miguel Ángel Vázquez",
-      specialty: "Traumatología",
-      experience: 22,
-      id: 7
-    },
-    {
-      name: "Dr. Fernando José Ramírez",
-      specialty: "Traumatología",
-      experience: 17,
-      id: 8
-    },
-    {
-      name: "Dra. Patricia Guadalupe Morales",
-      specialty: "Traumatología",
-      experience: 19,
-      id: 9
-    }
-  ];
+  // Filtrar especialidades basado en la búsqueda
+  const filteredSpecialties = uniqueSpecialties.filter(specialty =>
+    specialty.toLowerCase().includes(specialtySearchTerm.toLowerCase())
+  );
 
-  const filteredDoctors = selectedSpecialty === "Todas" 
-    ? doctors 
-    : doctors.filter(doctor => doctor.specialty === selectedSpecialty);
+
+  // Cargar doctores desde Strapi local
+  useEffect(() => {
+    const loadDoctors = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const doctorsData = await strapiService.getDoctores();
+        setDoctors(doctorsData);
+      } catch (err) {
+        console.error('❌ Error loading doctors:', err);
+        setError("Error al cargar doctores - mostrando datos de respaldo");
+        // Los datos de fallback ya se manejan en el servicio
+        const fallbackDoctors = await strapiService.getDoctores();
+        setDoctors(fallbackDoctors);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDoctors();
+  }, []);
+
+  const filteredDoctors = doctors.filter(doctor => {
+    const matchesSearch = searchTerm === "" ||
+      doctor.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSpecialty = selectedSpecialties.length === 0 || selectedSpecialties.includes(doctor.specialty);
+    return matchesSearch && matchesSpecialty;
+  });
+
+  // Funciones para manejar especialidades
+  const toggleSpecialty = (specialty: string) => {
+    setSelectedSpecialties(prev =>
+      prev.includes(specialty)
+        ? prev.filter(s => s !== specialty)
+        : [...prev, specialty]
+    );
+  };
+
+  const removeSpecialty = (specialty: string) => {
+    setSelectedSpecialties(prev => prev.filter(s => s !== specialty));
+  };
+
+  const clearAllSpecialties = () => {
+    setSelectedSpecialties([]);
+  };
+
+  // Cerrar dropdown al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.specialty-dropdown')) {
+        setIsSpecialtyDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const getSpecialtyIcon = (specialty: string) => {
-    switch (specialty) {
-      case "Pediatría":
-        return Baby;
-      case "Ginecología":
-        return Heart;
-      case "Traumatología":
-        return Bone;
-      default:
-        return Stethoscope;
-    }
+    const specialtyLower = specialty.toLowerCase();
+
+    // Pediatría
+    if (specialtyLower.includes('pediatr') || specialtyLower.includes('niños')) return Baby;
+
+    // Ginecología
+    if (specialtyLower.includes('ginecol') || specialtyLower.includes('mujer')) return Heart;
+
+    // Traumatología y Ortopedia
+    if (specialtyLower.includes('traumat') || specialtyLower.includes('ortoped') || specialtyLower.includes('hueso')) return Bone;
+
+    // Cardiología
+    if (specialtyLower.includes('cardiol') || specialtyLower.includes('corazón')) return Activity;
+
+    // Dermatología
+    if (specialtyLower.includes('dermato') || specialtyLower.includes('piel')) return UserCheck;
+
+    // Neurología
+    if (specialtyLower.includes('neurol') || specialtyLower.includes('cerebro')) return Brain;
+
+    // Oftalmología
+    if (specialtyLower.includes('oftalm') || specialtyLower.includes('ojo') || specialtyLower.includes('vista')) return Eye;
+
+    // Cirugía
+    if (specialtyLower.includes('cirug') || specialtyLower.includes('quirúr')) return Scissors;
+
+    // Odontología
+    if (specialtyLower.includes('odonto') || specialtyLower.includes('dental') || specialtyLower.includes('diente')) return Smile;
+
+    // Medicina interna, general, familiar
+    if (specialtyLower.includes('general') || specialtyLower.includes('intern') || specialtyLower.includes('familiar')) return Pill;
+
+    // Default
+    return Stethoscope;
   };
 
   const getSpecialtyColor = (specialty: string) => {
-    switch (specialty) {
-      case "Pediatría":
-        return "bg-accent/10 text-accent border-accent/20";
-      case "Ginecología":
-        return "bg-pink-100 text-pink-700 border-pink-200";
-      case "Traumatología":
-        return "bg-primary/10 text-primary border-primary/20";
-      default:
-        return "bg-muted text-muted-foreground border-border";
-    }
+    const specialtyLower = specialty.toLowerCase();
+
+    // Pediatría
+    if (specialtyLower.includes('pediatr') || specialtyLower.includes('niños'))
+      return "bg-accent/10 text-accent border-accent/20";
+
+    // Ginecología
+    if (specialtyLower.includes('ginecol') || specialtyLower.includes('mujer'))
+      return "bg-pink-100 text-pink-700 border-pink-200";
+
+    // Traumatología y Ortopedia
+    if (specialtyLower.includes('traumat') || specialtyLower.includes('ortoped') || specialtyLower.includes('hueso'))
+      return "bg-primary/10 text-primary border-primary/20";
+
+    // Cardiología
+    if (specialtyLower.includes('cardiol') || specialtyLower.includes('corazón'))
+      return "bg-red-100 text-red-700 border-red-200";
+
+    // Dermatología
+    if (specialtyLower.includes('dermato') || specialtyLower.includes('piel'))
+      return "bg-orange-100 text-orange-700 border-orange-200";
+
+    // Neurología
+    if (specialtyLower.includes('neurol') || specialtyLower.includes('cerebro'))
+      return "bg-purple-100 text-purple-700 border-purple-200";
+
+    // Oftalmología
+    if (specialtyLower.includes('oftalm') || specialtyLower.includes('ojo') || specialtyLower.includes('vista'))
+      return "bg-blue-100 text-blue-700 border-blue-200";
+
+    // Cirugía
+    if (specialtyLower.includes('cirug') || specialtyLower.includes('quirúr'))
+      return "bg-gray-100 text-gray-700 border-gray-200";
+
+    // Odontología
+    if (specialtyLower.includes('odonto') || specialtyLower.includes('dental') || specialtyLower.includes('diente'))
+      return "bg-cyan-100 text-cyan-700 border-cyan-200";
+
+    // Medicina interna, general, familiar
+    if (specialtyLower.includes('general') || specialtyLower.includes('intern') || specialtyLower.includes('familiar'))
+      return "bg-green-100 text-green-700 border-green-200";
+
+    // Default
+    return "bg-muted text-muted-foreground border-border";
+  };
+
+  const sendWhatsAppAppointment = (doctorName: string) => {
+    const mensaje = `Hola me gustaría agendar cita con el Doctor/a ${doctorName}`;
+    const mensajeCodificado = encodeURIComponent(mensaje);
+    const numeroWhatsApp = "524131651301";
+    const whatsappURL = `https://wa.me/${numeroWhatsApp}?text=${mensajeCodificado}`;
+    window.open(whatsappURL, '_blank');
   };
 
   return (
     <div className="pt-16">
       {/* Hero Section */}
-      <section className="py-16 bg-gradient-to-br from-primary/5 to-accent/5">
+      <section className="py-8 bg-gradient-to-br from-primary/5 to-accent/5">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto animate-fade-up">
             <h1 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
               Directorio Médico
             </h1>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-xl text-muted-foreground mb-0">
               Conoce a nuestros especialistas de alta calidad, comprometidos con tu bienestar
             </p>
+
+            {error && (
+              <div className="max-w-md mx-auto mb-4">
+                <div className="flex items-center space-x-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{error}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Filter Section */}
-      <section className="py-8 bg-white border-b border-border">
+
+      {/* Search Section */}
+      <section className="py-8 bg-gray-50 border-b border-border">
         <div className="container mx-auto px-4">
-          <div className="flex flex-wrap gap-3 justify-center">
-            {specialties.map((specialty) => {
-              const IconComponent = specialty.icon;
-              const isSelected = selectedSpecialty === specialty.name;
-              
-              return (
-                <Button
-                  key={specialty.name}
-                  variant={isSelected ? "medical-primary" : "medical-secondary"}
-                  onClick={() => setSelectedSpecialty(specialty.name)}
-                  className="flex items-center space-x-2"
+          <div className="max-w-3xl mx-auto relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+            <Input
+              type="text"
+              placeholder="Busca por especialidad o nombre del doctor"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 h-14 text-lg w-full"
+            />
+          </div>
+
+          {/* Specialty Filter Selector */}
+          <div className="max-w-3xl mx-auto mt-6">
+            {/* Selected Specialties Tags */}
+            {selectedSpecialties.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4 justify-center">
+                {selectedSpecialties.map((specialty) => (
+                  <div key={specialty} className="flex items-center bg-primary text-white px-3 py-1 rounded-full text-sm">
+                    <span>{specialty}</span>
+                    <button
+                      onClick={() => removeSpecialty(specialty)}
+                      className="ml-2 hover:bg-white/20 rounded-full p-1"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  onClick={clearAllSpecialties}
+                  className="text-sm text-gray-500 hover:text-gray-700 underline"
                 >
-                  <IconComponent className="w-4 h-4" />
-                  <span>{specialty.name}</span>
-                </Button>
-              );
-            })}
+                  Limpiar filtros
+                </button>
+              </div>
+            )}
+
+            {/* Specialty Dropdown */}
+            <div className="relative specialty-dropdown">
+              <div
+                className="w-full h-12 border border-gray-300 rounded-lg px-4 flex items-center justify-between cursor-pointer hover:border-gray-400 transition-colors"
+                onClick={() => setIsSpecialtyDropdownOpen(!isSpecialtyDropdownOpen)}
+              >
+                <span className="text-gray-600">
+                  {selectedSpecialties.length === 0
+                    ? "Filtrar por especialidad..."
+                    : `${selectedSpecialties.length} especialidad${selectedSpecialties.length !== 1 ? 'es' : ''} seleccionada${selectedSpecialties.length !== 1 ? 's' : ''}`
+                  }
+                </span>
+                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${
+                  isSpecialtyDropdownOpen ? 'rotate-180' : ''
+                }`} />
+              </div>
+
+              {isSpecialtyDropdownOpen && (
+                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg shadow-lg z-10 mt-1">
+                  {/* Search inside dropdown */}
+                  <div className="p-3 border-b border-gray-200">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        type="text"
+                        placeholder="Buscar especialidad..."
+                        value={specialtySearchTerm}
+                        onChange={(e) => setSpecialtySearchTerm(e.target.value)}
+                        className="pl-10 h-10"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Specialty options */}
+                  <div className="max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    {filteredSpecialties.map((specialty) => (
+                      <label
+                        key={specialty}
+                        className="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedSpecialties.includes(specialty)}
+                          onChange={() => toggleSpecialty(specialty)}
+                          className="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary focus:ring-2 mr-3"
+                        />
+                        <span className={`flex-1 text-sm ${
+                          selectedSpecialties.includes(specialty) ? 'text-primary font-medium' : 'text-gray-700'
+                        }`}>
+                          {specialty}
+                        </span>
+                      </label>
+                    ))}
+                    {filteredSpecialties.length === 0 && (
+                      <div className="p-3 text-gray-500 text-center text-sm">
+                        No se encontraron especialidades
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Doctors Grid */}
-      <section className="py-16">
+      <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {filteredDoctors.map((doctor) => {
-              const IconComponent = getSpecialtyIcon(doctor.specialty);
-              
-              return (
-                <Card key={doctor.id} className="medical-card group hover:scale-[1.02] transition-all duration-300">
-                  <CardContent className="p-6">
-                    <div className="text-center">
-                      {/* Doctor Icon */}
-                      <div className="p-4 bg-primary/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors duration-300">
-                        <IconComponent className="w-10 h-10 text-primary" />
-                      </div>
-                      
-                      {/* Doctor Info */}
-                      <h3 className="text-xl font-bold text-foreground mb-2">
-                        {doctor.name}
-                      </h3>
-                      
-                      <Badge 
-                        variant="secondary" 
-                        className={`mb-3 ${getSpecialtyColor(doctor.specialty)}`}
-                      >
-                        {doctor.specialty}
-                      </Badge>
-                      
-                      <div className="flex items-center justify-center space-x-2 text-muted-foreground">
-                        <Stethoscope className="w-4 h-4" />
-                        <span className="font-medium">
-                          {doctor.experience} años de experiencia
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-          
-          {filteredDoctors.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">
-                No hay médicos disponibles para la especialidad seleccionada
-              </p>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+              <p className="text-muted-foreground">Cargando doctores...</p>
             </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                {filteredDoctors.map((doctor) => {
+                  const IconComponent = getSpecialtyIcon(doctor.specialty);
+
+                  return (
+                    <Card key={doctor.id} className="medical-card group hover:scale-[1.02] transition-all duration-300">
+                      <CardContent className="p-6">
+                        <div className="text-center space-y-4">
+                          {/* Doctor Icon */}
+                          <div className="p-4 bg-primary/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto group-hover:bg-primary/20 transition-colors duration-300">
+                            <IconComponent className="w-10 h-10 text-primary" />
+                          </div>
+
+                          {/* Doctor Info */}
+                          <div>
+                            <h3 className="text-xl font-bold text-foreground mb-2">
+                              {doctor.name}
+                            </h3>
+
+                            <Badge
+                              variant="secondary"
+                              className={`mb-3 ${getSpecialtyColor(doctor.specialty)}`}
+                            >
+                              {doctor.specialty}
+                            </Badge>
+                          </div>
+
+                          {/* WhatsApp Button */}
+                          <Button
+                            onClick={() => sendWhatsAppAppointment(doctor.name)}
+                            variant="medical-primary"
+                            className="w-full flex items-center space-x-2"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                            <span>Agendar Cita</span>
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              {filteredDoctors.length === 0 && !loading && (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground text-lg">
+                    No hay médicos disponibles para la especialidad seleccionada
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
