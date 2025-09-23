@@ -106,7 +106,9 @@ class StrapiService {
         if (farmacia.Medicamentos && farmacia.Medicamentos.length > 0) {
           farmacia.Medicamentos.forEach((med) => {
             const imageUrl = med.Imagen && med.Imagen.length > 0
-              ? `${this.baseURL}${med.Imagen[0].url}`
+              ? (med.Imagen[0].url.startsWith('http')
+                  ? med.Imagen[0].url
+                  : `${this.baseURL}${med.Imagen[0].url}`)
               : undefined;
 
             medicamentos.push({
