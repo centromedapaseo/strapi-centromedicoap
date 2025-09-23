@@ -24,15 +24,30 @@ const Farmacia = () => {
         setLoading(true);
         setError(null);
 
+        console.log('🔄 Iniciando carga de datos de farmacia...');
+        console.log('🌐 Environment:', {
+          STRAPI_URL: import.meta.env.VITE_STRAPI_URL,
+          HAS_TOKEN: !!import.meta.env.VITE_STRAPI_API_TOKEN,
+          TOKEN_LENGTH: import.meta.env.VITE_STRAPI_API_TOKEN?.length || 0
+        });
+
         // Verificar conexión con Strapi
+        console.log('🔍 Verificando conexión con Strapi...');
         const isConnected = await strapiService.checkConnection();
+        console.log('📡 Conexión Strapi:', isConnected ? '✅ Conectado' : '❌ Desconectado');
         setStrapiConnected(isConnected);
 
         // Cargar medicamentos y promociones en paralelo
+        console.log('📦 Cargando medicamentos y promociones...');
         const [medicamentosData, promocionesData] = await Promise.all([
           strapiService.getMedicamentos(),
           strapiService.getPromociones()
         ]);
+
+        console.log('💊 Medicamentos obtenidos:', medicamentosData.length);
+        console.log('🎯 Promociones obtenidas:', promocionesData.length);
+        console.log('📋 Datos de medicamentos:', medicamentosData);
+        console.log('🏷️ Datos de promociones:', promocionesData);
 
         setMedications(medicamentosData);
         setPromotions(promocionesData);
@@ -41,7 +56,7 @@ const Farmacia = () => {
           setError("Conectado con datos de respaldo - Strapi no disponible");
         }
       } catch (err) {
-        console.error('Error loading data:', err);
+        console.error('❌ Error loading data:', err);
         setError("Error al cargar datos");
         // En caso de error, mostrar datos de fallback del servicio
         const [fallbackMedications, fallbackPromotions] = await Promise.all([
@@ -131,6 +146,31 @@ ${cart.map(item =>
               Medicamentos de calidad a precios accesibles. Tu salud es nuestra prioridad.
             </p>
 
+
+            {/* Debug Info - Mostrar en desarrollo y temporalmente en producción */}
+            <div className="max-w-4xl mx-auto mb-4 p-4 bg-gray-100 rounded-lg text-sm">
+              <h3 className="font-bold mb-2">🔧 Debug Info (Temporal)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <strong>Environment:</strong>
+                  <ul className="mt-1 space-y-1">
+                    <li>• URL: {import.meta.env.VITE_STRAPI_URL || 'No configurada'}</li>
+                    <li>• Token: {import.meta.env.VITE_STRAPI_API_TOKEN ? `${import.meta.env.VITE_STRAPI_API_TOKEN.substring(0, 20)}...` : 'No configurado'}</li>
+                    <li>• Mode: {import.meta.env.MODE}</li>
+                    <li>• Prod: {import.meta.env.PROD ? 'true' : 'false'}</li>
+                  </ul>
+                </div>
+                <div>
+                  <strong>Status:</strong>
+                  <ul className="mt-1 space-y-1">
+                    <li>• Conectado: {strapiConnected ? '✅' : '❌'}</li>
+                    <li>• Medicamentos: {medications.length}</li>
+                    <li>• Promociones: {promotions.length}</li>
+                    <li>• Loading: {loading ? 'true' : 'false'}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
 
             {error && (
               <div className="max-w-md mx-auto mb-4">
