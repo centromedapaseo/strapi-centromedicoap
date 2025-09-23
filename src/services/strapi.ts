@@ -1,14 +1,15 @@
 // Configuración del servicio Strapi
-const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || 'https://special-nurture-955505aa13.strapiapp.com';
-const API_TOKEN = import.meta.env.VITE_STRAPI_API_TOKEN || 'f0b6cd97a4471c8e1ae78d17b73eb76a99def67b67a0e5db8302a9b433478997f4fdcc3186941a9b5cb6d89a5f125180919e3af4b1c2539ae495b1796b20776f99014550cf8fe8e0d288b1c9657643f7ff4b5e7713c63a64ed19a1d397ed978e196fbc29a256e70b5bce88a1bea0acec733b979164e76608144ddd15f245fc59';
+const STRAPI_URL = 'https://special-nurture-955505aa13.strapiapp.com';
+const API_TOKEN = 'f0b6cd97a4471c8e1ae78d17b73eb76a99def67b67a0e5db8302a9b433478997f4fdcc3186941a9b5cb6d89a5f125180919e3af4b1c2539ae495b1796b20776f99014550cf8fe8e0d288b1c9657643f7ff4b5e7713c63a64ed19a1d397ed978e196fbc29a256e70b5bce88a1bea0acec733b979164e76608144ddd15f245fc59';
 
 console.log('🔧 Strapi Service Config:', {
   STRAPI_URL_ENV: import.meta.env.VITE_STRAPI_URL,
   STRAPI_URL_FINAL: STRAPI_URL,
-  API_TOKEN_ENV: import.meta.env.VITE_STRAPI_API_TOKEN ? 'SET' : 'NOT SET',
-  API_TOKEN_FINAL: API_TOKEN ? 'SET' : 'NOT SET',
+  API_TOKEN_ENV: import.meta.env.VITE_STRAPI_API_TOKEN ? import.meta.env.VITE_STRAPI_API_TOKEN.substring(0, 20) + '...' : 'NOT SET',
+  API_TOKEN_FINAL: API_TOKEN ? API_TOKEN.substring(0, 20) + '...' : 'NOT SET',
   MODE: import.meta.env.MODE,
-  PROD: import.meta.env.PROD
+  PROD: import.meta.env.PROD,
+  ALL_ENV: import.meta.env
 });
 
 // Función para asegurar HTTPS en producción
