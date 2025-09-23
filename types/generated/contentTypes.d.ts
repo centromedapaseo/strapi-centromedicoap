@@ -441,6 +441,34 @@ export interface ApiFarmaciaFarmacia extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiMedicoMedico extends Struct.CollectionTypeSchema {
+  collectionName: 'medicos';
+  info: {
+    displayName: 'Medico';
+    pluralName: 'medicos';
+    singularName: 'medico';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::medico.medico'
+    > &
+      Schema.Attribute.Private;
+    Medicos: Schema.Attribute.Component<'nombre-medicos.medicos', true>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiPromocionmedPromocionmed
   extends Struct.CollectionTypeSchema {
   collectionName: 'promocionmeds';
@@ -984,6 +1012,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::farmacia.farmacia': ApiFarmaciaFarmacia;
+      'api::medico.medico': ApiMedicoMedico;
       'api::promocionmed.promocionmed': ApiPromocionmedPromocionmed;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

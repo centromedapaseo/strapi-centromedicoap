@@ -19,6 +19,23 @@
     "Nombremedicamento": {
       "type": "string"
     },
+    "Contenido": {
+      "type": "string"
+    },
+    "CompuestoActivo": {
+      "type": "string"
+    },
+    "Presentacion": {
+      "type": "enumeration",
+      "enum": [
+        "Tableta",
+        "Spray",
+        "Crema",
+        "Gel",
+        "Solucion",
+        "Suspencion"
+      ]
+    },
     "Categoria": {
       "type": "enumeration",
       "enum": [
@@ -27,12 +44,6 @@
         "Vitaminas",
         "Antibiotico"
       ]
-    },
-    "Descripcion": {
-      "type": "string"
-    },
-    "Precio": {
-      "type": "decimal"
     }
   },
   "config": {}
