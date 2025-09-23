@@ -16,7 +16,8 @@ import {
 // URLs del video hero optimizadas
 const heroVideoWebM = "https://res.cloudinary.com/djkt9hofl/video/upload/q_auto,f_webm,w_1200,h_800,c_fill/v1757034412/video-hero-principal_ao73ab.webm";
 const heroVideoMP4 = "https://res.cloudinary.com/djkt9hofl/video/upload/q_auto,f_mp4,w_1200,h_800,c_fill/v1757034412/video-hero-principal_ao73ab.mp4";
-const heroVideoPoster = "https://res.cloudinary.com/djkt9hofl/image/upload/q_auto,f_auto,w_1200,h_800,c_fill/v1757034412/video-hero-principal_ao73ab.jpg";
+// Removed broken poster image
+const heroVideoPoster = "";
 import LocationMap from "@/components/LocationMap";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -117,7 +118,7 @@ const Home = () => {
             loop
             playsInline
             preload="none"
-            poster={heroVideoPoster}
+            poster={heroVideoPoster || undefined}
             onLoadedData={() => setVideoLoaded(true)}
             style={{
               objectFit: 'cover',

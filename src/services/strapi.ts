@@ -151,9 +151,9 @@ class StrapiService {
       // Transformar datos de Strapi al formato del componente
       const medicamentos: Medicamento[] = [];
 
-      data.data.forEach((farmacia: StrapiMedicamento) => {
+      data.data.forEach((farmacia: any) => {
         if (farmacia.Medicamentos && farmacia.Medicamentos.length > 0) {
-          farmacia.Medicamentos.forEach((med) => {
+          farmacia.Medicamentos.forEach((med: any) => {
             const imageUrl = med.Imagen && med.Imagen.length > 0
               ? (med.Imagen[0].url.startsWith('http')
                   ? med.Imagen[0].url
@@ -163,9 +163,10 @@ class StrapiService {
             medicamentos.push({
               id: med.id,
               name: med.Nombremedicamento,
-              content: med.Contenido || "Consultar",
+              // Compatibilidad con formato anterior y nuevo
+              content: med.Contenido || med.Descripcion || "Consultar",
               activeCompound: med.CompuestoActivo || "No especificado",
-              presentation: med.Presentacion || "No especificado",
+              presentation: med.Presentacion || "Tableta",
               image: imageUrl,
               inStock: true // Por defecto, consideramos que está en stock
             });
