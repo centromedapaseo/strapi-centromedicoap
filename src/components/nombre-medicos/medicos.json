@@ -14,19 +14,21 @@
       "enum": [
         "Cirugía General",
         "Dermatología",
-        "Gastrointerología",
+        "Gastroenterología",
         "Gineco-Obstetricia",
         "Medicina General",
         "Nefrología",
+        "Neurocirugía",
         "Nutriología",
         "Odontología",
         "Odontopediatría",
+        "Oftalmología",
         "Oncología",
         "Otorrinolaringología",
         "Pediatría",
         "Psicología",
         "Traumatología y Ortopedia",
-        "Urologia"
+        "Urología"
       ]
     }
   },
