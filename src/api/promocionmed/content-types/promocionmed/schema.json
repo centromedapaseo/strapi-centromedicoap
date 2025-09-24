@@ -1,0 +1,20 @@
+{
+  "kind": "collectionType",
+  "collectionName": "promocionmeds",
+  "info": {
+    "singularName": "promocionmed",
+    "pluralName": "promocionmeds",
+    "displayName": "promocionmed"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "detallepromocion": {
+      "type": "component",
+      "component": "nombre-promocion.nomprepromocion",
+      "repeatable": true
+    }
+  }
+}
