@@ -1,0 +1,19 @@
+# Ignore Strapi project files
+my-strapi-project/
+.strapi/
+.tmp/
+*.db
+*.db.backup
+
+# Ignore development files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignore node_modules in subdirectories
+my-strapi-project/node_modules/
+
+# Ignore backup files
+backup-*
+*backup*
