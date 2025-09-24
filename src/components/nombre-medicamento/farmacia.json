@@ -36,6 +36,12 @@
         "Vitaminas",
         "Antibiotico"
       ]
+    },
+    "Descripcion": {
+      "type": "string"
+    },
+    "Precio": {
+      "type": "decimal"
     }
   },
   "config": {}
