@@ -4,17 +4,5 @@
   "outputDirectory": "dist",
   "installCommand": "npm install --production=false",
   "devCommand": "npm run dev",
-  "framework": "vite",
-  "ignore": [
-    "my-strapi-project/**",
-    ".strapi/**",
-    ".tmp/**"
-  ],
-  "functions": {
-    "app.js": {
-      "excludeFiles": [
-        "my-strapi-project/**"
-      ]
-    }
-  }
+  "framework": "vite"
 }
