@@ -17,7 +17,9 @@ export interface NombreMedicamentoFarmacia extends Struct.ComponentSchema {
       true
     >;
     Nombremedicamento: Schema.Attribute.String;
-    Presentacion: Schema.Attribute.String;
+    Presentacion: Schema.Attribute.Enumeration<
+      ['Tableta', 'Spray', 'Crema', 'Gel', 'Solucion', 'Suspencion']
+    >;
   };
 }
 
