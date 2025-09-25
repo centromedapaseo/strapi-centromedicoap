@@ -1,9 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { MapPin, Phone, Mail, Clock, MessageCircle, Facebook, Instagram } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, MessageCircle, Facebook, Instagram, X } from "lucide-react";
 import logo from "@/assets/imagotipo.png";
 
 const Footer = () => {
+  const [showEmailModal, setShowEmailModal] = useState(false);
+
+  const emailProviders = [
+    {
+      name: 'Gmail',
+      url: 'https://mail.google.com/mail/?view=cm&fs=1&to=contacto@centromedicopaseo.com',
+      icon: '📧'
+    },
+    {
+      name: 'Outlook',
+      url: 'https://outlook.live.com/owa/?path=/mail/action/compose&to=contacto@centromedicopaseo.com',
+      icon: '📨'
+    },
+    {
+      name: 'Yahoo Mail',
+      url: 'https://compose.mail.yahoo.com/?to=contacto@centromedicopaseo.com',
+      icon: '✉️'
+    },
+    {
+      name: 'Cliente por defecto',
+      url: 'mailto:contacto@centromedicopaseo.com',
+      icon: '📮'
+    }
+  ];
+
+  const handleEmailClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowEmailModal(true);
+  };
+
+  const handleProviderSelect = (url: string) => {
+    window.open(url, '_blank');
+    setShowEmailModal(false);
+  };
+
   return (
     <footer className="bg-gradient-to-br from-slate-800 via-primary to-slate-900 text-white py-16">
       <div className="container mx-auto px-4">
@@ -75,7 +110,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center space-x-3">
                 <Mail className="w-4 h-4" />
-                <span className="text-white/80">info@centromedicoapaseo.org</span>
+                <button onClick={handleEmailClick} className="text-white/80 hover:text-white transition-colors text-left">contacto@centromedicopaseo.com</button>
               </li>
               <li className="flex items-center space-x-3">
                 <Facebook className="w-4 h-4" />
@@ -113,6 +148,36 @@ const Footer = () => {
           </p>
         </div>
       </div>
+
+      {/* Email Provider Modal */}
+      {showEmailModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowEmailModal(false)}>
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Enviar correo</h3>
+              <button
+                onClick={() => setShowEmailModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-gray-600 mb-4">Elige tu proveedor de correo preferido:</p>
+            <div className="grid grid-cols-1 gap-3">
+              {emailProviders.map((provider) => (
+                <button
+                  key={provider.name}
+                  onClick={() => handleProviderSelect(provider.url)}
+                  className="flex items-center space-x-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 hover:border-primary transition-colors text-left"
+                >
+                  <span className="text-xl">{provider.icon}</span>
+                  <span className="text-gray-900 font-medium">{provider.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </footer>
   );
 };
