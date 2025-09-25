@@ -11,10 +11,14 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "detallepromocion": {
-      "type": "component",
-      "component": "nombre-promocion.nomprepromocion",
-      "repeatable": true
+    "NombrePromocion": {
+      "type": "string"
+    },
+    "TextoPromocion": {
+      "type": "string"
+    },
+    "FechaPromocion": {
+      "type": "string"
     }
   }
 }
