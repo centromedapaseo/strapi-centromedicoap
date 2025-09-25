@@ -11,6 +11,7 @@ import Pacientes from "./pages/Pacientes";
 import Directorio from "./pages/Directorio";
 import Farmacia from "./pages/Farmacia";
 import NotFound from "./pages/NotFound";
+import Documentacion from "./pages/Documentacion";
 import ScrollToTopWrapper from "./components/ScrollToTopWrapper";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
                 <Route path="/pacientes" element={<Pacientes />} />
                 <Route path="/directorio" element={<Directorio />} />
                 <Route path="/farmacia" element={<Farmacia />} />
+                <Route path="/documentacion" element={<Documentacion />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

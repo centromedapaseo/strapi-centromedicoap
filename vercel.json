@@ -4,5 +4,11 @@
   "outputDirectory": "dist",
   "installCommand": "npm install --production=false",
   "devCommand": "npm run dev",
-  "framework": "vite"
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
