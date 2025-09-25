@@ -28,33 +28,29 @@ export interface StrapiPromocion {
   }>;
 }
 
-// Interface para los medicamentos de Strapi
+// Interface para los medicamentos de Strapi (nuevo content type)
 export interface StrapiMedicamento {
   id: number;
   documentId: string;
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  Medicamentos: Array<{
+  Medicamento: string;
+  compuestoActivo: string;
+  contenido: string;
+  presentacion: string;
+  Imagen?: Array<{
     id: number;
-    Nombremedicamento: string;
-    Categoria: string;
-    Contenido: string;
-    CompuestoActivo: string;
-    Presentacion: string;
-    Imagen: Array<{
-      id: number;
-      documentId: string;
-      name: string;
-      alternativeText: string | null;
-      url: string;
-      formats?: {
-        thumbnail?: { url: string };
-        small?: { url: string };
-        medium?: { url: string };
-        large?: { url: string };
-      };
-    }>;
+    documentId: string;
+    name: string;
+    alternativeText: string | null;
+    url: string;
+    formats?: {
+      thumbnail?: { url: string };
+      small?: { url: string };
+      medium?: { url: string };
+      large?: { url: string };
+    };
   }>;
 }
 
@@ -69,14 +65,14 @@ export interface Medicamento {
   inStock: boolean;
 }
 
-// Interfaces para Doctores
+// Interfaces para Doctores (nuevo content type)
 export interface StrapiMedico {
   id: number;
   documentId: string;
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  Nombre: string;
+  NombreDoctor: string;
   Especialidad: string;
 }
 
@@ -143,35 +139,28 @@ class StrapiService {
     }
   }
 
-  // Obtener todos los medicamentos desde Strapi Cloud (con fallback)
+  // Obtener todos los medicamentos desde Strapi Cloud (nuevo content type)
   async getMedicamentos(): Promise<Medicamento[]> {
     try {
-      const data = await this.fetchFromStrapi('/farmacias?populate=Medicamentos.Imagen');
+      const data = await this.fetchFromStrapi('/medicamentos?populate=Imagen');
 
-      // Transformar datos de Strapi al formato del componente
-      const medicamentos: Medicamento[] = [];
+      // Transformar datos del nuevo content type al formato del componente
+      const medicamentos: Medicamento[] = data.data.map((med: StrapiMedicamento) => {
+        const imageUrl = med.Imagen && med.Imagen.length > 0
+          ? (med.Imagen[0].url.startsWith('http')
+              ? med.Imagen[0].url
+              : `${this.baseURL}${med.Imagen[0].url}`)
+          : undefined;
 
-      data.data.forEach((farmacia: any) => {
-        if (farmacia.Medicamentos && farmacia.Medicamentos.length > 0) {
-          farmacia.Medicamentos.forEach((med: any) => {
-            const imageUrl = med.Imagen && med.Imagen.length > 0
-              ? (med.Imagen[0].url.startsWith('http')
-                  ? med.Imagen[0].url
-                  : `${this.baseURL}${med.Imagen[0].url}`)
-              : undefined;
-
-            medicamentos.push({
-              id: med.id,
-              name: med.Nombremedicamento,
-              // Compatibilidad con formato anterior y nuevo
-              content: med.Contenido || med.Descripcion || "Consultar",
-              activeCompound: med.CompuestoActivo || "No especificado",
-              presentation: med.Presentacion || "Tableta",
-              image: imageUrl,
-              inStock: true // Por defecto, consideramos que está en stock
-            });
-          });
-        }
+        return {
+          id: med.id,
+          name: med.Medicamento,
+          content: med.contenido || "Consultar",
+          activeCompound: med.compuestoActivo || "No especificado",
+          presentation: med.presentacion || "Tableta",
+          image: imageUrl,
+          inStock: true // Por defecto, consideramos que está en stock
+        };
       });
 
       return medicamentos.length > 0 ? medicamentos : this.getFallbackMedicamentos();
@@ -309,23 +298,15 @@ class StrapiService {
     ];
   }
 
-  // Obtener promociones
+  // Obtener promociones (usando campos del nuevo schema)
   async getPromociones(): Promise<string[]> {
     try {
-      const data = await this.fetchFromStrapi('/promocionmeds?populate=detallepromocion');
+      const data = await this.fetchFromStrapi('/promocionmeds?populate=*');
 
-      // Transformar datos de Strapi al formato del componente
-      const promociones: string[] = [];
-
-      data.data.forEach((promocionGroup: StrapiPromocion) => {
-        if (promocionGroup.detallepromocion && promocionGroup.detallepromocion.length > 0) {
-          promocionGroup.detallepromocion.forEach((promo) => {
-            if (promo.detallepromo && promo.detallepromo.trim()) {
-              promociones.push(promo.detallepromo);
-            }
-          });
-        }
-      });
+      // Transformar datos usando los campos correctos del schema
+      const promociones: string[] = data.data.map((promo: any) => {
+        return promo.TextoPromocion || promo.NombrePromocion || "Promoción disponible";
+      }).filter(Boolean);
 
       return promociones.length > 0 ? promociones : this.getFallbackPromociones();
     } catch (error) {
@@ -347,7 +328,7 @@ class StrapiService {
   // Verificar si Strapi está disponible
   async checkConnection(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseURL}/api/farmacias`, {
+      const response = await fetch(`${this.baseURL}/api/medicamentos`, {
         method: 'HEAD',
         headers: {
           ...(this.apiToken && { Authorization: `Bearer ${this.apiToken}` }),
@@ -360,32 +341,22 @@ class StrapiService {
     }
   }
 
-  // Obtener doctores desde Strapi Cloud (con fallback)
+  // Obtener doctores desde Strapi Cloud (nuevo content type)
   async getDoctores(): Promise<Doctor[]> {
     try {
       const data = await this.fetchFromStrapi('/medicos?populate=*');
 
-      // Transformar datos de Strapi al formato del componente
-      const doctores: Doctor[] = [];
-
-      data.data.forEach((medicoGroup: any) => {
-        if (medicoGroup.Medicos && medicoGroup.Medicos.length > 0) {
-          medicoGroup.Medicos.forEach((medico: any) => {
-            if (medico.Nombre) {
-              doctores.push({
-                id: medico.id,
-                name: medico.Nombre,
-                specialty: medico.Especialidad || 'General',
-              });
-            }
-          });
-        }
-      });
+      // Transformar datos del nuevo content type al formato del componente
+      const doctores: Doctor[] = data.data.map((medico: StrapiMedico) => ({
+        id: medico.id,
+        name: medico.NombreDoctor,
+        specialty: medico.Especialidad || 'General',
+      }));
 
       return doctores.length > 0 ? doctores : this.getFallbackDoctores();
     } catch (error) {
-      console.warn('Medicos endpoint not found, using fallback data:', error);
-      // Retornar datos de fallback si el endpoint no existe
+      console.warn('Medicos endpoint error, using fallback data:', error);
+      // Retornar datos de fallback si hay error
       return this.getFallbackDoctores();
     }
   }
