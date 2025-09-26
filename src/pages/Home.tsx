@@ -16,8 +16,13 @@ import {
 // URLs del video hero optimizadas
 const heroVideoWebM = "https://res.cloudinary.com/dciqzuzxv/video/upload/q_auto,f_webm,w_1200,h_800,c_fill/v1758838531/Home-Hero_ocefqd.webm";
 const heroVideoMP4 = "https://res.cloudinary.com/dciqzuzxv/video/upload/v1758838531/Home-Hero_ocefqd.mp4";
-// Removed broken poster image
-const heroVideoPoster = "";
+
+// URLs optimizadas para móvil (menor resolución y bitrate)
+const heroVideoWebM_Mobile = "https://res.cloudinary.com/dciqzuzxv/video/upload/q_auto:low,f_webm,w_800,h_600,c_fill,br_800k/v1758838531/Home-Hero_ocefqd.webm";
+const heroVideoMP4_Mobile = "https://res.cloudinary.com/dciqzuzxv/video/upload/q_auto:low,f_auto,w_800,h_600,c_fill,br_800k/v1758838531/Home-Hero_ocefqd.mp4";
+
+// Poster generado automáticamente desde el video (frame del segundo 2)
+const heroVideoPoster = "https://res.cloudinary.com/dciqzuzxv/video/upload/so_2,q_auto,f_auto,w_1200,h_800,c_fill/v1758838531/Home-Hero_ocefqd.jpg";
 import LocationMap from "@/components/LocationMap";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -31,6 +36,7 @@ const Home = () => {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [isSlowConnection, setIsSlowConnection] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const locationRef = useGSAPScrollAnimation(
     undefined,
     (element) => {
@@ -60,6 +66,12 @@ const Home = () => {
   );
 
   useEffect(() => {
+    // Detectar si es móvil
+    const checkIfMobile = () => {
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+      setIsMobile(isMobileDevice);
+    };
+
     // Detectar conexión lenta
     const checkConnection = () => {
       if ('connection' in navigator) {
@@ -68,9 +80,12 @@ const Home = () => {
           const slowConnections = ['slow-2g', '2g', '3g'];
           const isSlowNetwork = slowConnections.includes(connection.effectiveType) || connection.downlink < 1.5;
           setIsSlowConnection(isSlowNetwork);
-          
-          // Si no es conexión lenta, cargar video automáticamente
-          if (!isSlowNetwork) {
+
+          // En móvil con conexión lenta, no cargar automáticamente
+          const currentIsMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+          if (currentIsMobile && isSlowNetwork) {
+            setShouldLoadVideo(false);
+          } else if (!isSlowNetwork) {
             setShouldLoadVideo(true);
           }
         } else {
@@ -83,6 +98,7 @@ const Home = () => {
       }
     };
 
+    checkIfMobile();
     checkConnection();
 
     // Lazy load del video solo si debe cargarse
@@ -91,7 +107,7 @@ const Home = () => {
         heroVideoRef.current.load();
       }
     };
-    
+
     if (shouldLoadVideo) {
       setTimeout(loadVideo, 500);
     }
@@ -102,6 +118,14 @@ const Home = () => {
         { opacity: 1, y: 0, duration: 1.2, stagger: 0.3, ease: "power2.out" }
       );
     }
+
+    // Listener para cambios de tamaño de pantalla
+    const handleResize = () => {
+      checkIfMobile();
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [shouldLoadVideo]);
 
   return (
@@ -125,8 +149,8 @@ const Home = () => {
               objectPosition: 'center'
             }}
           >
-            <source src={heroVideoWebM} type="video/webm" />
-            <source src={heroVideoMP4} type="video/mp4" />
+            <source src={isMobile ? heroVideoWebM_Mobile : heroVideoWebM} type="video/webm" />
+            <source src={isMobile ? heroVideoMP4_Mobile : heroVideoMP4} type="video/mp4" />
             Tu navegador no soporta video HTML5.
           </video>
         ) : (

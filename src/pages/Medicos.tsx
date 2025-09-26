@@ -14,11 +14,18 @@ const Medicos = () => {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [isSlowConnection, setIsSlowConnection] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   
   // URLs del video hero optimizadas - Hospital storage
-  const heroVideoWebM = "https://res.cloudinary.com/dciqzuzxv/video/upload/q_auto,f_webm,w_1200,h_800,c_fill/v1758838531/Home-Hero_ocefqd.webm";
-  const heroVideoMP4 = "https://res.cloudinary.com/dciqzuzxv/video/upload/v1758838531/Home-Hero_ocefqd.mp4";
-  const heroVideoPoster = "";
+  const heroVideoWebM = "https://res.cloudinary.com/dciqzuzxv/video/upload/q_auto,f_webm,w_1200,h_800,c_fill/v1758838561/Hero-Medicos_e4pliw.webm";
+  const heroVideoMP4 = "https://res.cloudinary.com/dciqzuzxv/video/upload/v1758838561/Hero-Medicos_e4pliw.mp4";
+
+  // URLs optimizadas para móvil (menor resolución y bitrate)
+  const heroVideoWebM_Mobile = "https://res.cloudinary.com/dciqzuzxv/video/upload/q_auto:low,f_webm,w_800,h_600,c_fill,br_800k/v1758838561/Hero-Medicos_e4pliw.webm";
+  const heroVideoMP4_Mobile = "https://res.cloudinary.com/dciqzuzxv/video/upload/q_auto:low,f_auto,w_800,h_600,c_fill,br_800k/v1758838561/Hero-Medicos_e4pliw.mp4";
+
+  // Poster generado automáticamente desde el video (frame del segundo 2)
+  const heroVideoPoster = "https://res.cloudinary.com/dciqzuzxv/video/upload/so_2,q_auto,f_auto,w_1200,h_800,c_fill/v1758838561/Hero-Medicos_e4pliw.jpg";
   
   const processSteps = [
     {
@@ -42,6 +49,12 @@ const Medicos = () => {
   const whatsappLink = "https://wa.me/524131651301?text=Me%20interesa%20saber%20mas%20del%20hospital,%20soy%20el%20Dr:";
 
   useEffect(() => {
+    // Detectar si es móvil
+    const checkIfMobile = () => {
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+      setIsMobile(isMobileDevice);
+    };
+
     // Detectar conexión lenta
     const checkConnection = () => {
       if ('connection' in navigator) {
@@ -50,9 +63,12 @@ const Medicos = () => {
           const slowConnections = ['slow-2g', '2g', '3g'];
           const isSlowNetwork = slowConnections.includes(connection.effectiveType) || connection.downlink < 1.5;
           setIsSlowConnection(isSlowNetwork);
-          
-          // Si no es conexión lenta, cargar video automáticamente
-          if (!isSlowNetwork) {
+
+          // En móvil con conexión lenta, no cargar automáticamente
+          const currentIsMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+          if (currentIsMobile && isSlowNetwork) {
+            setShouldLoadVideo(false);
+          } else if (!isSlowNetwork) {
             setShouldLoadVideo(true);
           }
         } else {
@@ -65,6 +81,7 @@ const Medicos = () => {
       }
     };
 
+    checkIfMobile();
     checkConnection();
 
     // Lazy load del video solo si debe cargarse
@@ -73,10 +90,18 @@ const Medicos = () => {
         heroVideoRef.current.load();
       }
     };
-    
+
     if (shouldLoadVideo) {
       setTimeout(loadVideo, 500);
     }
+
+    // Listener para cambios de tamaño de pantalla
+    const handleResize = () => {
+      checkIfMobile();
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [shouldLoadVideo]);
 
   return (
@@ -100,8 +125,8 @@ const Medicos = () => {
               objectPosition: 'center'
             }}
           >
-            <source src={heroVideoWebM} type="video/webm" />
-            <source src={heroVideoMP4} type="video/mp4" />
+            <source src={isMobile ? heroVideoWebM_Mobile : heroVideoWebM} type="video/webm" />
+            <source src={isMobile ? heroVideoMP4_Mobile : heroVideoMP4} type="video/mp4" />
             Tu navegador no soporta video HTML5.
           </video>
         ) : (
