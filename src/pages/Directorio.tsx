@@ -52,6 +52,16 @@ const Directorio = () => {
       doctor.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesSpecialty = selectedSpecialties.length === 0 || selectedSpecialties.includes(doctor.specialty);
     return matchesSearch && matchesSpecialty;
+  }).sort((a, b) => {
+    // Remove "Dr.", "Dra.", "Lic." from names for sorting
+    const cleanNameA = a.name.replace(/^(Dr\.?\s+|Dra\.?\s+|Lic\.?\s+)/i, '').trim();
+    const cleanNameB = b.name.replace(/^(Dr\.?\s+|Dra\.?\s+|Lic\.?\s+)/i, '').trim();
+
+    // Extract first name for alphabetical sorting by first name
+    const firstNameA = cleanNameA.split(' ')[0] || cleanNameA;
+    const firstNameB = cleanNameB.split(' ')[0] || cleanNameB;
+
+    return firstNameA.localeCompare(firstNameB, 'es', { sensitivity: 'base' });
   });
 
   // Funciones para manejar especialidades
@@ -85,87 +95,39 @@ const Directorio = () => {
   }, []);
 
   const getSpecialtyIcon = (specialty: string) => {
+    const specialtyMap: Record<string, any> = {
+      pediatr: Baby, ginecol: Heart, traumat: Bone, ortoped: Bone,
+      cardiol: Activity, dermato: UserCheck, neurol: Brain,
+      oftalm: Eye, cirug: Scissors, odonto: Smile, dental: Smile,
+      general: Pill, intern: Pill, familiar: Pill
+    };
+
     const specialtyLower = specialty.toLowerCase();
-
-    // Pediatría
-    if (specialtyLower.includes('pediatr') || specialtyLower.includes('niños')) return Baby;
-
-    // Ginecología
-    if (specialtyLower.includes('ginecol') || specialtyLower.includes('mujer')) return Heart;
-
-    // Traumatología y Ortopedia
-    if (specialtyLower.includes('traumat') || specialtyLower.includes('ortoped') || specialtyLower.includes('hueso')) return Bone;
-
-    // Cardiología
-    if (specialtyLower.includes('cardiol') || specialtyLower.includes('corazón')) return Activity;
-
-    // Dermatología
-    if (specialtyLower.includes('dermato') || specialtyLower.includes('piel')) return UserCheck;
-
-    // Neurología
-    if (specialtyLower.includes('neurol') || specialtyLower.includes('cerebro')) return Brain;
-
-    // Oftalmología
-    if (specialtyLower.includes('oftalm') || specialtyLower.includes('ojo') || specialtyLower.includes('vista')) return Eye;
-
-    // Cirugía
-    if (specialtyLower.includes('cirug') || specialtyLower.includes('quirúr')) return Scissors;
-
-    // Odontología
-    if (specialtyLower.includes('odonto') || specialtyLower.includes('dental') || specialtyLower.includes('diente')) return Smile;
-
-    // Medicina interna, general, familiar
-    if (specialtyLower.includes('general') || specialtyLower.includes('intern') || specialtyLower.includes('familiar')) return Pill;
-
-    // Default
-    return Stethoscope;
+    const match = Object.keys(specialtyMap).find(key => specialtyLower.includes(key));
+    return match ? specialtyMap[match] : Stethoscope;
   };
 
   const getSpecialtyColor = (specialty: string) => {
+    const colorMap: Record<string, string> = {
+      pediatr: "bg-accent/10 text-accent border-accent/20",
+      ginecol: "bg-pink-100 text-pink-700 border-pink-200",
+      traumat: "bg-primary/10 text-primary border-primary/20",
+      ortoped: "bg-primary/10 text-primary border-primary/20",
+      cardiol: "bg-red-100 text-red-700 border-red-200",
+      dermato: "bg-orange-100 text-orange-700 border-orange-200",
+      neurol: "bg-purple-100 text-purple-700 border-purple-200",
+      oftalm: "bg-blue-100 text-blue-700 border-blue-200",
+      cirug: "bg-gray-100 text-gray-700 border-gray-200",
+      odonto: "bg-cyan-100 text-cyan-700 border-cyan-200",
+      dental: "bg-cyan-100 text-cyan-700 border-cyan-200",
+      general: "bg-green-100 text-green-700 border-green-200",
+      intern: "bg-green-100 text-green-700 border-green-200",
+      familiar: "bg-green-100 text-green-700 border-green-200"
+    };
+
     const specialtyLower = specialty.toLowerCase();
-
-    // Pediatría
-    if (specialtyLower.includes('pediatr') || specialtyLower.includes('niños'))
-      return "bg-accent/10 text-accent border-accent/20";
-
-    // Ginecología
-    if (specialtyLower.includes('ginecol') || specialtyLower.includes('mujer'))
-      return "bg-pink-100 text-pink-700 border-pink-200";
-
-    // Traumatología y Ortopedia
-    if (specialtyLower.includes('traumat') || specialtyLower.includes('ortoped') || specialtyLower.includes('hueso'))
-      return "bg-primary/10 text-primary border-primary/20";
-
-    // Cardiología
-    if (specialtyLower.includes('cardiol') || specialtyLower.includes('corazón'))
-      return "bg-red-100 text-red-700 border-red-200";
-
-    // Dermatología
-    if (specialtyLower.includes('dermato') || specialtyLower.includes('piel'))
-      return "bg-orange-100 text-orange-700 border-orange-200";
-
-    // Neurología
-    if (specialtyLower.includes('neurol') || specialtyLower.includes('cerebro'))
-      return "bg-purple-100 text-purple-700 border-purple-200";
-
-    // Oftalmología
-    if (specialtyLower.includes('oftalm') || specialtyLower.includes('ojo') || specialtyLower.includes('vista'))
-      return "bg-blue-100 text-blue-700 border-blue-200";
-
-    // Cirugía
-    if (specialtyLower.includes('cirug') || specialtyLower.includes('quirúr'))
-      return "bg-gray-100 text-gray-700 border-gray-200";
-
-    // Odontología
-    if (specialtyLower.includes('odonto') || specialtyLower.includes('dental') || specialtyLower.includes('diente'))
-      return "bg-cyan-100 text-cyan-700 border-cyan-200";
-
-    // Medicina interna, general, familiar
-    if (specialtyLower.includes('general') || specialtyLower.includes('intern') || specialtyLower.includes('familiar'))
-      return "bg-green-100 text-green-700 border-green-200";
-
-    // Default
-    return "bg-muted text-muted-foreground border-border";
+    const match = Object.keys(colorMap).find(key => specialtyLower.includes(key));
+    return match ? colorMap[match] : "bg-muted text-muted-foreground border-border";
   };
 
   const sendWhatsAppAppointment = (doctorName: string) => {

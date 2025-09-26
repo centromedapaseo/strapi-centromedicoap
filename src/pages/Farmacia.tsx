@@ -62,6 +62,8 @@ const Farmacia = () => {
     med.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     med.presentation.toLowerCase().includes(searchTerm.toLowerCase()) ||
     med.activeCompound.toLowerCase().includes(searchTerm.toLowerCase())
+  ).sort((a, b) =>
+    a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })
   );
 
   const addToCart = (medication: Medication) => {

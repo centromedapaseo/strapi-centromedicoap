@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Award, Users, Building, MessageCircle, Play } from "lucide-react";
-import heroDoctors from "@/assets/hero-doctors.jpg";
 import LocationMap from "@/components/LocationMap";
 import InsuranceCarousel from "@/components/InsuranceCarousel";
 import ProcessSection from "@/components/ProcessStep";
@@ -16,10 +15,10 @@ const Medicos = () => {
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [isSlowConnection, setIsSlowConnection] = useState(false);
   
-  // URLs del video hero optimizadas
-  const heroVideoWebM = "https://res.cloudinary.com/djkt9hofl/video/upload/q_auto,f_webm,w_1200,h_800,c_fill/v1757111404/medicos-hero_kkrnyc.webm";
-  const heroVideoMP4 = "https://res.cloudinary.com/djkt9hofl/video/upload/q_auto,f_mp4,w_1200,h_800,c_fill/v1757111404/medicos-hero_kkrnyc.mp4";
-  const heroVideoPoster = "https://res.cloudinary.com/djkt9hofl/image/upload/q_auto,f_auto,w_1200,h_800,c_fill/v1757111404/medicos-hero_kkrnyc.jpg";
+  // URLs del video hero optimizadas - Hospital storage
+  const heroVideoWebM = "https://res.cloudinary.com/dciqzuzxv/video/upload/q_auto,f_webm,w_1200,h_800,c_fill/v1758838531/Home-Hero_ocefqd.webm";
+  const heroVideoMP4 = "https://res.cloudinary.com/dciqzuzxv/video/upload/v1758838531/Home-Hero_ocefqd.mp4";
+  const heroVideoPoster = "";
   
   const processSteps = [
     {
@@ -41,7 +40,6 @@ const Medicos = () => {
   ];
 
   const whatsappLink = "https://wa.me/524131651301?text=Me%20interesa%20saber%20mas%20del%20hospital,%20soy%20el%20Dr:";
-  const emailLink = "mailto:info@centromedicoapaseo.com?subject=Solicitud%20de%20información%20médica&body=Estimado%20equipo,%0A%0AMe%20interesa%20recibir%20más%20información%20sobre%20los%20servicios%20médicos%20del%20hospital.%0A%0AGracias";
 
   useEffect(() => {
     // Detectar conexión lenta
@@ -95,7 +93,7 @@ const Medicos = () => {
             loop
             playsInline
             preload="none"
-            poster={heroVideoPoster}
+            poster={heroVideoPoster || undefined}
             onLoadedData={() => setVideoLoaded(true)}
             style={{
               objectFit: 'cover',
@@ -107,12 +105,14 @@ const Medicos = () => {
             Tu navegador no soporta video HTML5.
           </video>
         ) : (
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${heroVideoPoster})`
-            }}
-          />
+          heroVideoPoster ? (
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url(${heroVideoPoster})`
+              }}
+            />
+          ) : null
         )}
         
         {!videoLoaded && shouldLoadVideo && (
