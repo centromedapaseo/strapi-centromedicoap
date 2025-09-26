@@ -34,10 +34,10 @@ const Pacientes = () => {
   const [shouldLoadVideo, setShouldLoadVideo] = React.useState(false);
   const [isSlowConnection, setIsSlowConnection] = React.useState(false);
 
-  // URLs del video hero optimizadas
-  const heroVideoWebM = "https://res.cloudinary.com/djkt9hofl/video/upload/q_auto,f_webm,w_800,h_600,c_fill/v1757115620/hero-pacientes_tck9jo.webm";
-  const heroVideoMP4 = "https://res.cloudinary.com/djkt9hofl/video/upload/q_auto,f_mp4,w_800,h_600,c_fill/v1757115620/hero-pacientes_tck9jo.mp4";
-  const heroVideoPoster = "https://res.cloudinary.com/djkt9hofl/image/upload/q_auto,f_auto,w_800,h_600,c_fill/v1757115620/hero-pacientes_tck9jo.jpg";
+  // URLs del video hero optimizadas - Hospital storage
+  const heroVideoWebM = "https://res.cloudinary.com/dciqzuzxv/video/upload/q_auto,f_webm,w_800,h_600,c_fill/v1758838842/Hero-Pacientes_q4x8df.webm";
+  const heroVideoMP4 = "https://res.cloudinary.com/dciqzuzxv/video/upload/v1758838842/Hero-Pacientes_q4x8df.mp4";
+  const heroVideoPoster = "https://res.cloudinary.com/dciqzuzxv/image/upload/q_auto,f_auto,w_800,h_600,c_fill/v1758838842/Hero-Pacientes_q4x8df.jpg";
 
   useEffect(() => {
     if (!heroRef.current) return;
@@ -482,9 +482,9 @@ const Pacientes = () => {
               <div className="benefit-image lg:order-last">
                 <Card className="overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 border-0">
                   <div className="aspect-[4/3] overflow-hidden">
-                    <img 
-                      src="https://res.cloudinary.com/djkt9hofl/image/upload/v1757637472/Cuarto_Hospital_dvapbl.webp" 
-                      alt="Cuarto de hospital cómodo" 
+                    <img
+                      src="https://res.cloudinary.com/dciqzuzxv/image/upload/v1758838971/Cuarto_Hospital_mjix4p.webp"
+                      alt="Cuarto de hospital cómodo"
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                     />
                   </div>
@@ -497,9 +497,9 @@ const Pacientes = () => {
               <div className="benefit-image lg:order-first">
                 <Card className="overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 border-0">
                   <div className="aspect-[4/3] overflow-hidden">
-                    <img 
-                      src="https://res.cloudinary.com/djkt9hofl/image/upload/v1757637582/Cafeteria_ynwys6.webp" 
-                      alt="Cafetería del hospital" 
+                    <img
+                      src="https://res.cloudinary.com/dciqzuzxv/image/upload/v1758839191/Cafeteria_ynwys6_fgrxho.webp"
+                      alt="Cafetería del hospital"
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                     />
                   </div>
@@ -540,9 +540,9 @@ const Pacientes = () => {
               <div className="benefit-image lg:order-last">
                 <Card className="overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 border-0">
                   <div className="aspect-[4/3] overflow-hidden">
-                    <img 
-                      src="https://res.cloudinary.com/djkt9hofl/image/upload/v1757637478/Quirofano_phltwn.webp" 
-                      alt="Quirófano con tecnología avanzada" 
+                    <img
+                      src="https://res.cloudinary.com/dciqzuzxv/image/upload/v1758839192/Quirofano_phltwn_czo9da.webp"
+                      alt="Quirófano con tecnología avanzada"
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                     />
                   </div>
@@ -555,9 +555,9 @@ const Pacientes = () => {
               <div className="benefit-image lg:order-first">
                 <Card className="overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 border-0">
                   <div className="aspect-[4/3] overflow-hidden">
-                    <img 
-                      src="https://res.cloudinary.com/djkt9hofl/image/upload/v1757637479/Hemodialisis_bmoaoo.webp" 
-                      alt="Clínica de hemodiálisis" 
+                    <img
+                      src="https://res.cloudinary.com/dciqzuzxv/image/upload/v1758838971/Hemodialisis_e9od8a.webp"
+                      alt="Clínica de hemodiálisis"
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                     />
                   </div>

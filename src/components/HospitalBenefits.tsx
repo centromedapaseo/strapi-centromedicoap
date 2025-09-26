@@ -119,7 +119,7 @@ const HospitalBenefits = () => {
               <Card className="overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 border-0 group">
                 <div className="aspect-[4/3] overflow-hidden relative">
                   <img 
-                    src="https://res.cloudinary.com/djkt9hofl/image/upload/v1757637478/Quirofano_phltwn.webp" 
+                    src="https://res.cloudinary.com/dciqzuzxv/image/upload/v1758839192/Quirofano_phltwn_czo9da.webp" 
                     alt="Quirófano moderno con tecnología avanzada" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
@@ -136,7 +136,7 @@ const HospitalBenefits = () => {
               <Card className="overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 border-0 group">
                 <div className="aspect-[4/3] overflow-hidden relative">
                   <img 
-                    src="https://res.cloudinary.com/djkt9hofl/image/upload/v1758071356/Comunilab_tmuluf.webp" 
+                    src="https://res.cloudinary.com/dciqzuzxv/image/upload/v1758839191/Comunilab_gf6nwg_b8yjzg.webp" 
                     alt="Laboratorio Comunilab moderno" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     style={{objectPosition: 'center 40%', transform: 'scale(1.2)'}}
@@ -196,7 +196,7 @@ const HospitalBenefits = () => {
               <Card className="overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500 border-0 group">
                 <div className="aspect-[4/3] overflow-hidden relative">
                   <img 
-                    src="https://res.cloudinary.com/djkt9hofl/image/upload/v1757637479/Hemodialisis_bmoaoo.webp" 
+                    src="https://res.cloudinary.com/dciqzuzxv/image/upload/v1758838971/Hemodialisis_e9od8a.webp" 
                     alt="Clínica de hemodiálisis Hemmovil" 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />

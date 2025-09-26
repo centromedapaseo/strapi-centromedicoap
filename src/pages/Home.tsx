@@ -1,22 +1,21 @@
 // test dos
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { 
-  Stethoscope, 
-  Heart, 
-  Users, 
+import {
+  Stethoscope,
+  Heart,
+  Users,
   Pill,
   Award,
-  MapPin,
   Clock,
   Star,
   Play
 } from "lucide-react";
 // URLs del video hero optimizadas
-const heroVideoWebM = "https://res.cloudinary.com/djkt9hofl/video/upload/q_auto,f_webm,w_1200,h_800,c_fill/v1757034412/video-hero-principal_ao73ab.webm";
-const heroVideoMP4 = "https://res.cloudinary.com/djkt9hofl/video/upload/q_auto,f_mp4,w_1200,h_800,c_fill/v1757034412/video-hero-principal_ao73ab.mp4";
+const heroVideoWebM = "https://res.cloudinary.com/dciqzuzxv/video/upload/q_auto,f_webm,w_1200,h_800,c_fill/v1758838531/Home-Hero_ocefqd.webm";
+const heroVideoMP4 = "https://res.cloudinary.com/dciqzuzxv/video/upload/v1758838531/Home-Hero_ocefqd.mp4";
 // Removed broken poster image
 const heroVideoPoster = "";
 import LocationMap from "@/components/LocationMap";
@@ -131,12 +130,14 @@ const Home = () => {
             Tu navegador no soporta video HTML5.
           </video>
         ) : (
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${heroVideoPoster})`
-            }}
-          />
+          heroVideoPoster ? (
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              style={{
+                backgroundImage: `url(${heroVideoPoster})`
+              }}
+            />
+          ) : null
         )}
         
         {!videoLoaded && shouldLoadVideo && (
@@ -187,7 +188,7 @@ const Home = () => {
                 <Link to="/directorio">Directorio Médico</Link>
               </Button>
               <Button asChild variant="medical-white" size="lg" className="text-sm sm:text-base lg:text-lg px-6 sm:px-8 py-3 sm:py-4 font-semibold w-full sm:w-auto hidden sm:flex">
-                <Link to="/farmacia">Medicamentos Baratos</Link>
+                <Link to="/farmacia">Farmacia</Link>
               </Button>
             </div>
           </div>

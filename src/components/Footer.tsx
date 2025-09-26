@@ -103,10 +103,15 @@ const Footer = () => {
               </li>
               <li className="flex items-start space-x-3">
                 <MapPin className="w-4 h-4 mt-1" />
-                <span className="text-white/80">
+                <a
+                  href="https://maps.app.goo.gl/PXBhVJPyZwU6j5EHA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/80 hover:text-white transition-colors"
+                >
                   Av. Independencia 304 A<br />
                   Zona Centro, Apaseo el Alto, Gto.
-                </span>
+                </a>
               </li>
               <li className="flex items-center space-x-3">
                 <Mail className="w-4 h-4" />
