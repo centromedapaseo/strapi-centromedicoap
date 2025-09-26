@@ -37,7 +37,8 @@ const Pacientes = () => {
   // URLs del video hero optimizadas - Hospital storage
   const heroVideoWebM = "https://res.cloudinary.com/dciqzuzxv/video/upload/q_auto,f_webm,w_800,h_600,c_fill/v1758838842/Hero-Pacientes_q4x8df.webm";
   const heroVideoMP4 = "https://res.cloudinary.com/dciqzuzxv/video/upload/v1758838842/Hero-Pacientes_q4x8df.mp4";
-  const heroVideoPoster = "https://res.cloudinary.com/dciqzuzxv/image/upload/q_auto,f_auto,w_800,h_600,c_fill/v1758838842/Hero-Pacientes_q4x8df.jpg";
+  // Poster generado automáticamente desde el video (frame del segundo 2)
+  const heroVideoPoster = "https://res.cloudinary.com/dciqzuzxv/video/upload/so_2,q_auto,f_auto,w_800,h_600,c_fill/v1758838842/Hero-Pacientes_q4x8df.jpg";
 
   useEffect(() => {
     if (!heroRef.current) return;

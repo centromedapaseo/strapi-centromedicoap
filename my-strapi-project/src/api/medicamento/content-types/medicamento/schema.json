@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "medicamentos",
+  "info": {
+    "singularName": "medicamento",
+    "pluralName": "medicamentos",
+    "displayName": "Medicamentos"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Medicamento": {
+      "type": "string",
+      "unique": true
+    },
+    "compuestoActivo": {
+      "type": "string"
+    },
+    "contenido": {
+      "type": "string"
+    },
+    "presentacion": {
+      "type": "string"
+    },
+    "Imagen": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  }
+}
