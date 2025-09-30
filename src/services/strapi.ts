@@ -1,6 +1,6 @@
 // Configuración del servicio Strapi
 const STRAPI_URL = 'https://special-nurture-955505aa13.strapiapp.com';
-const API_TOKEN = 'f0b6cd97a4471c8e1ae78d17b73eb76a99def67b67a0e5db8302a9b433478997f4fdcc3186941a9b5cb6d89a5f125180919e3af4b1c2539ae495b1796b20776f99014550cf8fe8e0d288b1c9657643f7ff4b5e7713c63a64ed19a1d397ed978e196fbc29a256e70b5bce88a1bea0acec733b979164e76608144ddd15f245fc59';
+const API_TOKEN = '1157478ae9d5ab126eda15ed84c9e815bb50444ae4ec52b23cc52197bfe2df2422884044ca49fdbe8a02d6ebe155b44e5811b4e2d41b9543a66cd2c179e777b514b485ebe6d11070d911e55a2f5d5045c25b2d5b70f0ed841688b639f989c4ce9fc5487849f887e63872807b7fd1b5554f111a3391e50c5935ea264b41702c98';
 
 // Configuración para Strapi local (medicamentos y doctores)
 const LOCAL_STRAPI_URL = 'http://localhost:1337';
@@ -89,18 +89,9 @@ class StrapiService {
   private apiToken: string;
 
   constructor() {
-    // Detectar si estamos en desarrollo local
-    const isLocalDev = typeof window !== 'undefined' &&
-                       (window.location.hostname === 'localhost' ||
-                        window.location.hostname === '127.0.0.1');
-
-    if (isLocalDev) {
-      this.baseURL = LOCAL_STRAPI_URL;
-      this.apiToken = LOCAL_API_TOKEN;
-    } else {
-      this.baseURL = getSecureUrl(STRAPI_URL);
-      this.apiToken = API_TOKEN;
-    }
+    // Siempre usar Strapi Cloud (tanto en desarrollo como producción)
+    this.baseURL = getSecureUrl(STRAPI_URL);
+    this.apiToken = API_TOKEN;
   }
 
   // Función para hacer fetch desde Strapi local (doctores)
@@ -321,21 +312,12 @@ class StrapiService {
         return promo.TextoPromocion || promo.NombrePromocion || "Promoción disponible";
       }).filter(Boolean);
 
-      return promociones.length > 0 ? promociones : this.getFallbackPromociones();
+      return promociones;
     } catch (error) {
       console.error('Error getting promociones:', error);
-      // Retornar datos de fallback en caso de error
-      return this.getFallbackPromociones();
+      // Retornar array vacío en caso de error
+      return [];
     }
-  }
-
-  // Datos de fallback para promociones
-  private getFallbackPromociones(): string[] {
-    return [
-      "20% de descuento en vitaminas",
-      "Envío gratis en compras mayores a $500",
-      "2x1 en analgésicos seleccionados"
-    ];
   }
 
   // Verificar si Strapi está disponible

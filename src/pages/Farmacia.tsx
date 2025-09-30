@@ -153,20 +153,22 @@ ${cart.map(item =>
       </section>
 
       {/* Promotions Banner */}
-      <section className="py-8 bg-gradient-to-r from-primary to-accent text-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">🎉 Promociones del Mes</h2>
-            <div className="flex flex-wrap justify-center gap-6">
-              {promotions.map((promo, index) => (
-                <Badge key={index} variant="secondary" className="bg-white/20 text-white border-white/30 px-4 py-2">
-                  {promo}
-                </Badge>
-              ))}
+      {promotions.length > 0 && (
+        <section className="py-8 bg-gradient-to-r from-primary to-accent text-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-4">🎉 Promociones del Mes</h2>
+              <div className="flex flex-wrap justify-center gap-6">
+                {promotions.map((promo, index) => (
+                  <Badge key={index} variant="secondary" className="bg-white/20 text-white border-white/30 px-4 py-2">
+                    {promo}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Search Section */}
       <section className="py-8 bg-white border-b border-border">

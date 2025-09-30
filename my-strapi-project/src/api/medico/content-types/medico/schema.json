@@ -11,10 +11,30 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "Medicos": {
-      "type": "component",
-      "component": "nombre-medicos.medicos",
-      "repeatable": true
+    "NombreDoctor": {
+      "type": "string"
+    },
+    "Especialidad": {
+      "type": "enumeration",
+      "enum": [
+        "Cirugía General",
+        "Dermatología",
+        "Gastroenterología",
+        "Gineco-Obstetricia",
+        "Medicina General",
+        "Nefrología",
+        "Neurocirugía",
+        "Nutriología",
+        "Odontología",
+        "Odontopediatría",
+        "Oftalmología",
+        "Oncología",
+        "Otorrinolaringología",
+        "Pediatría",
+        "Psicología",
+        "Traumatología y Ortopedia",
+        "Urología"
+      ]
     }
   }
 }

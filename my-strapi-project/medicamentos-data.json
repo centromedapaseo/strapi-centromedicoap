@@ -1,0 +1,93 @@
+[
+  {
+    "Medicamento": "AMOXILINA",
+    "compuestoActivo": "",
+    "contenido": "500MG",
+    "presentacion": "12 CAPSULAS",
+    "Precio": 35
+  },
+  {
+    "Medicamento": "ANTIFLU- DES JR",
+    "compuestoActivo": "AMANTADINA, CLORFENAMINA, PARACETAMOL",
+    "contenido": "60 ML",
+    "presentacion": "JARABE INFANTI",
+    "Precio": 100
+  },
+  {
+    "Medicamento": "ANTIGRAM",
+    "compuestoActivo": "ACETILSALICILATO DE LISINA, METOCLOPRAMIDA",
+    "contenido": "1.62G/ 10MG",
+    "presentacion": "POLVO",
+    "Precio": 730
+  },
+  {
+    "Medicamento": "CAPSIFLU TOTAL",
+    "compuestoActivo": "",
+    "contenido": "",
+    "presentacion": "12 CAPSULAS",
+    "Precio": 47
+  },
+  {
+    "Medicamento": "CICLOFERON",
+    "compuestoActivo": "ACICLOVIR",
+    "contenido": "400 MG",
+    "presentacion": "35 TABLETAS",
+    "Precio": 960
+  },
+  {
+    "Medicamento": "CLAMOXIN",
+    "compuestoActivo": "AMOXICILINA/ACIDO CLAVULANICO",
+    "contenido": "875MG/125MG",
+    "presentacion": "10 TABLETA",
+    "Precio": 70
+  },
+  {
+    "Medicamento": "CORPOTASIN CL",
+    "compuestoActivo": "BICARBONATO POTASICO, CLORURO DE POTASIO, LISINA",
+    "contenido": "500.560 MG,372.750 MG",
+    "presentacion": "EFERVESCENTE",
+    "Precio": 526
+  },
+  {
+    "Medicamento": "FEBRAX",
+    "compuestoActivo": "NAPROXENO, PARACETAMOL",
+    "contenido": "100MG/200MG",
+    "presentacion": "SUPOSITORIOS",
+    "Precio": 76
+  },
+  {
+    "Medicamento": "FIRAC",
+    "compuestoActivo": "CLONIXINATO DE LISINA",
+    "contenido": "250MG",
+    "presentacion": "10 TABLETA",
+    "Precio": 299
+  },
+  {
+    "Medicamento": "GREMITAL",
+    "compuestoActivo": "OSELTAMIVIR",
+    "contenido": "45MG",
+    "presentacion": "10 CAPSULAS",
+    "Precio": 400
+  },
+  {
+    "Medicamento": "ISORBID",
+    "compuestoActivo": "DINITRATO DE ISOSORBIDA",
+    "contenido": "10MG",
+    "presentacion": "40 TABLETAS",
+    "Precio": 356
+  },
+  {
+    "Medicamento": "MAVIGLIN",
+    "compuestoActivo": "METFORMINA/GLIBENCLAMIDA",
+    "contenido": "500MG/5MG",
+    "presentacion": "60 TABLETA",
+    "Precio": 65
+  },
+  {
+    "Medicamento": "SYNTHROID",
+    "compuestoActivo": "LEVOTIROXINA SODICA",
+    "contenido": "50 MG",
+    "presentacion": "30 TABLETA",
+    "Precio": 155
+  }
+]
