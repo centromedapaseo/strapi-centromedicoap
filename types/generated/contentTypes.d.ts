@@ -107,43 +107,6 @@ export interface AdminApiTokenPermission extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface AdminAuditLog extends Struct.CollectionTypeSchema {
-  collectionName: 'strapi_audit_logs';
-  info: {
-    displayName: 'Audit Log';
-    pluralName: 'audit-logs';
-    singularName: 'audit-log';
-  };
-  options: {
-    draftAndPublish: false;
-    timestamps: false;
-  };
-  pluginOptions: {
-    'content-manager': {
-      visible: false;
-    };
-    'content-type-builder': {
-      visible: false;
-    };
-  };
-  attributes: {
-    action: Schema.Attribute.String & Schema.Attribute.Required;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    date: Schema.Attribute.DateTime & Schema.Attribute.Required;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<'oneToMany', 'admin::audit-log'> &
-      Schema.Attribute.Private;
-    payload: Schema.Attribute.JSON;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    user: Schema.Attribute.Relation<'oneToOne', 'admin::user'>;
-  };
-}
-
 export interface AdminPermission extends Struct.CollectionTypeSchema {
   collectionName: 'admin_permissions';
   info: {
@@ -410,30 +373,35 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiFarmaciaFarmacia extends Struct.CollectionTypeSchema {
-  collectionName: 'farmacias';
+export interface ApiMedicamentoMedicamento extends Struct.CollectionTypeSchema {
+  collectionName: 'medicamentos';
   info: {
-    displayName: 'MedicamentosFarmacia';
-    pluralName: 'farmacias';
-    singularName: 'farmacia';
+    displayName: 'Medicamentos';
+    pluralName: 'medicamentos';
+    singularName: 'medicamento';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
+    compuestoActivo: Schema.Attribute.String;
+    contenido: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    Imagen: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
-      'api::farmacia.farmacia'
+      'api::medicamento.medicamento'
     > &
       Schema.Attribute.Private;
-    Medicamentos: Schema.Attribute.Component<
-      'nombre-medicamento.farmacia',
-      true
-    >;
+    Medicamento: Schema.Attribute.String & Schema.Attribute.Unique;
+    Precio: Schema.Attribute.Decimal;
+    presentacion: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -455,13 +423,34 @@ export interface ApiMedicoMedico extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    Especialidad: Schema.Attribute.Enumeration<
+      [
+        'Cirug\u00EDa General',
+        'Dermatolog\u00EDa',
+        'Gastroenterolog\u00EDa',
+        'Gineco-Obstetricia',
+        'Medicina General',
+        'Nefrolog\u00EDa',
+        'Neurocirug\u00EDa',
+        'Nutriolog\u00EDa',
+        'Odontolog\u00EDa',
+        'Odontopediatr\u00EDa',
+        'Oftalmolog\u00EDa',
+        'Oncolog\u00EDa',
+        'Otorrinolaringolog\u00EDa',
+        'Pediatr\u00EDa',
+        'Psicolog\u00EDa',
+        'Traumatolog\u00EDa y Ortopedia',
+        'Urolog\u00EDa',
+      ]
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::medico.medico'
     > &
       Schema.Attribute.Private;
-    Medicos: Schema.Attribute.Component<'nombre-medicos.medicos', true>;
+    NombreDoctor: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -484,17 +473,16 @@ export interface ApiPromocionmedPromocionmed
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    detallepromocion: Schema.Attribute.Component<
-      'nombre-promocion.nomprepromocion',
-      true
-    >;
+    FechaPromocion: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::promocionmed.promocionmed'
     > &
       Schema.Attribute.Private;
+    NombrePromocion: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    TextoPromocion: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1005,13 +993,12 @@ declare module '@strapi/strapi' {
     export interface ContentTypeSchemas {
       'admin::api-token': AdminApiToken;
       'admin::api-token-permission': AdminApiTokenPermission;
-      'admin::audit-log': AdminAuditLog;
       'admin::permission': AdminPermission;
       'admin::role': AdminRole;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
-      'api::farmacia.farmacia': ApiFarmaciaFarmacia;
+      'api::medicamento.medicamento': ApiMedicamentoMedicamento;
       'api::medico.medico': ApiMedicoMedico;
       'api::promocionmed.promocionmed': ApiPromocionmedPromocionmed;
       'plugin::content-releases.release': PluginContentReleasesRelease;

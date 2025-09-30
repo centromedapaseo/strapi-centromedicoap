@@ -24,6 +24,9 @@
     "presentacion": {
       "type": "string"
     },
+    "Precio": {
+      "type": "decimal"
+    },
     "Imagen": {
       "type": "media",
       "multiple": true,
