@@ -245,6 +245,14 @@ ${cart.map(item =>
                             </p>
                           </div>
 
+                          {medication.price && (
+                            <div className="pt-2 border-t border-border">
+                              <p className="text-2xl font-bold text-primary text-center">
+                                ${medication.price.toFixed(2)}
+                              </p>
+                            </div>
+                          )}
+
                           <div className="flex justify-center">
                             <Button
                               variant={medication.inStock ? "medical-primary" : "outline"}
@@ -298,6 +306,9 @@ ${cart.map(item =>
                         <div>
                           <h3 className="font-semibold text-foreground">{item.name}</h3>
                           <p className="text-sm text-muted-foreground">{item.content} - {item.presentation}</p>
+                          {item.price && (
+                            <p className="text-lg font-bold text-primary mt-1">${item.price.toFixed(2)}</p>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center space-x-4">
