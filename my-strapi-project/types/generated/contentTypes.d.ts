@@ -433,7 +433,7 @@ export interface ApiMedicoMedico extends Struct.CollectionTypeSchema {
         'Nefrolog\u00EDa',
         'Neurocirug\u00EDa',
         'Nutriolog\u00EDa',
-        'Odontolog\u00EDa',
+        'Ortodoncia y Ortopedia Maxilo-Facial',
         'Odontopediatr\u00EDa',
         'Oftalmolog\u00EDa',
         'Oncolog\u00EDa',
@@ -442,6 +442,7 @@ export interface ApiMedicoMedico extends Struct.CollectionTypeSchema {
         'Psicolog\u00EDa',
         'Traumatolog\u00EDa y Ortopedia',
         'Urolog\u00EDa',
+        'Medicina Interna',
       ]
     >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
